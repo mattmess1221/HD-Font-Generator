@@ -1,7 +1,9 @@
 package mnm.hdfontgen;
 
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Graphics2D;
+import java.awt.font.FontRenderContext;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -19,6 +21,7 @@ public class AsciiPackUtils {
 
     private static char[][] ascii;
     private static String packJson;
+    private static Font fallback;
 
     /**
      * Renders a ascii {@link BufferedImage} of the given font.
@@ -34,7 +37,7 @@ public class AsciiPackUtils {
 
     }
 
-    public static BufferedImage render(HDFont font, int tableInt) {
+    public static BufferedImage render(HDFont font, int tableInt) throws IOException {
         int a = tableInt << 8;
         char[][] table = new char[16][16];
         for (int y = 0; y < 16; y++) {
@@ -53,8 +56,18 @@ public class AsciiPackUtils {
      * @param font
      * @param ascii
      * @return
+     * @throws IOException
+     * @throws FontFormatException
      */
-    public static BufferedImage render(HDFont font, char[][] ascii) {
+    public static BufferedImage render(HDFont font, char[][] ascii) throws IOException {
+        if (fallback == null) {
+            try {
+                fallback = Font.createFont(Font.TRUETYPE_FONT,
+                        ClassLoader.getSystemResourceAsStream("unifont-7.0.06.ttf"));
+            } catch (FontFormatException | IOException e) {
+                throw new IOException("Unable to read Unifont fallback font.", e);
+            }
+        }
         final int size = font.getSize().getTextureSize() / 2;
         BufferedImage image = new BufferedImage(size * 16, size * 16, BufferedImage.TYPE_INT_ARGB_PRE);
         Graphics2D g2d = image.createGraphics();
@@ -68,8 +81,22 @@ public class AsciiPackUtils {
                 BufferedImage c = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB_PRE);
                 Graphics2D gc = c.createGraphics();
 
+                // select the font if the character is supported.
+                Font f = fallback;
+                if (font.getFont().canDisplay((int) ch)) {
+                    f = font.getFont();
+                }
+                f = f.deriveFont(0, size);
+
+                // decrease font size for large fonts.
+                int s = size;
+                while (f.getStringBounds(new char[] { ch }, 0, 1, new FontRenderContext(f.getTransform(), false, false))
+                        .getHeight() > size) {
+                    f = f.deriveFont(0, s--);
+                }
+
                 // pre-render the character
-                gc.setFont(new Font(font.getFont().getName(), 0, size));
+                gc.setFont(f);
                 gc.drawChars(new char[] { ch }, 0, 1, 0, yy);
                 gc.dispose();
 
