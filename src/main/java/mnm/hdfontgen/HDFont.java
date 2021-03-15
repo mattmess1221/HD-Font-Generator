@@ -1,41 +1,71 @@
 package mnm.hdfontgen;
 
-import java.awt.Font;
+import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class HDFont {
 
+    private static final Font fallbackFont = loadDefaultFont();
+
     private final Font font;
     private final TextureSize size;
-    private final boolean unicode;
 
-    public HDFont(Font font) {
-        this(font, TextureSize.x32, false);
-    }
-
-    public HDFont(Font font, TextureSize size, boolean unicode) {
+    public HDFont(Font font, TextureSize size) {
         this.font = font;
         this.size = size;
-        this.unicode = unicode;
     }
 
-    public Font getFont() {
-        return font;
+    public String getFriendlyName(boolean unicode) {
+        return String.format("%s %s%s", font.getFontName(), size, unicode ? " with unicode" : "");
     }
 
-    public TextureSize getSize() {
-        return size;
+    public BufferedImage render(char[][] chars) {
+        int size = this.size.getTextureSize() / 2;
+        int yOffset = size - size / 4;
+        BufferedImage image = new BufferedImage(size * 16, size * 16, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = (Graphics2D) image.getGraphics();
+        for (int y = 0; y < 16; y++) {
+            for (int x = 0; x < 16; x++) {
+                char charToRender = chars[y][x];
+                int xPos = x * size;
+                int yPos = y * size;
+                graphics.setClip(xPos, yPos, size, size);
+                graphics.setFont(this.getFontForChar(charToRender));
+                graphics.drawChars(new char[]{charToRender}, 0, 1, xPos, yPos + yOffset);
+            }
+        }
+        graphics.dispose();
+        return image;
     }
 
-    public boolean isUnicode() {
-        return unicode;
+    private Font getFontForChar(char ch) {
+        final int size = this.size.getTextureSize() / 2;
+        Font f = (font.canDisplay(ch) ? font : fallbackFont).deriveFont(Font.PLAIN, size);
+        f = f.deriveFont(Font.PLAIN, size);
+
+        String stringToCheck = Character.toString(ch);
+
+        // decrease font size for large fonts.
+        int s = size;
+        while (getStringHeight(f, stringToCheck) > size) {
+            f = f.deriveFont(Font.PLAIN, s--);
+        }
+        return f;
     }
 
-    @Override
-    public String toString() {
-        return font.getFontName();
+    private static double getStringHeight(Font f, String string) {
+        FontRenderContext context = new FontRenderContext(f.getTransform(), false, false);
+        return f.getStringBounds(string, context).getHeight();
     }
 
-    public String getFriendlyName() {
-        return toString() + " " + getSize() + (isUnicode() ? " with unicode" : "");
+    private static Font loadDefaultFont() {
+        try (InputStream in = HDFont.class.getResourceAsStream("/unifont-7.0.06.ttf")) {
+            return Font.createFont(Font.TRUETYPE_FONT, in);
+        } catch (FontFormatException | IOException e) {
+            throw new RuntimeException("Unable to read Unifont fallback font", e);
+        }
     }
 }

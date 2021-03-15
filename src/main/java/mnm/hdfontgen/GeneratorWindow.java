@@ -1,33 +1,14 @@
 package mnm.hdfontgen;
 
-import java.awt.BorderLayout;
-import java.awt.Font;
-import java.awt.GraphicsEnvironment;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.TitledBorder;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Vector;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.TitledBorder;
 
 /*
  * Mostly generated using Window Builder Pro
@@ -38,7 +19,7 @@ public class GeneratorWindow implements ActionListener, ItemListener, Runnable {
     private Thread thread;
 
     JFrame frmHdFontGenerator;
-    private JComboBox<HDFont> choice;
+    private JComboBox<String> choiceFont;
     private JComboBox<TextureSize> comboBox;
     private JLabel lblDisplay;
     private JLabel lblStatus;
@@ -89,15 +70,15 @@ public class GeneratorWindow implements ActionListener, ItemListener, Runnable {
         gbc_lblFont.gridy = 1;
         panel.add(lblFont, gbc_lblFont);
 
-        choice = new JComboBox<>(new Vector<>(getInstalledFonts()));
-        choice.addItemListener(this);
+        choiceFont = new JComboBox<>(getInstalledFonts());
+        choiceFont.addItemListener(this);
         GridBagConstraints gbc_choice = new GridBagConstraints();
         gbc_choice.fill = GridBagConstraints.BOTH;
         gbc_choice.gridwidth = 2;
         gbc_choice.insets = new Insets(0, 0, 5, 5);
         gbc_choice.gridx = 1;
         gbc_choice.gridy = 2;
-        panel.add(choice, gbc_choice);
+        panel.add(choiceFont, gbc_choice);
 
         JLabel lblTextureSize = new JLabel("Texture Size:");
         GridBagConstraints gbc_lblTextureSize = new GridBagConstraints();
@@ -137,16 +118,12 @@ public class GeneratorWindow implements ActionListener, ItemListener, Runnable {
         frmHdFontGenerator.getContentPane().add(lblStatus, BorderLayout.SOUTH);
     }
 
-    private Collection<HDFont> getInstalledFonts() {
-        List<HDFont> fonts = new ArrayList<>();
-        for (Font f : GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts()) {
-            fonts.add(new HDFont(f));
-        }
-        return fonts;
+    private String[] getInstalledFonts() {
+        return GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
     }
 
-    private HDFont getChoice() {
-        return (HDFont) choice.getSelectedItem();
+    private Font getChoiceFont() {
+        return Font.decode((String) choiceFont.getSelectedItem());
     }
 
     private TextureSize getTextureSize() {
@@ -154,7 +131,7 @@ public class GeneratorWindow implements ActionListener, ItemListener, Runnable {
     }
 
     public void itemStateChanged(ItemEvent e) {
-        Font f = getChoice().getFont();
+        Font f = getChoiceFont();
         lblDisplay.setFont(new Font(f.getName(), Font.PLAIN, 24));
     }
 
@@ -171,10 +148,11 @@ public class GeneratorWindow implements ActionListener, ItemListener, Runnable {
         lblStatus.setText("Working...");
         btnCreate.setEnabled(false);
 
-        HDFont font = new HDFont(getChoice().getFont(), getTextureSize(), checkboxUnicode.isSelected());
+        HDFont font = new HDFont(getChoiceFont(), getTextureSize());
+        boolean unicode = checkboxUnicode.isSelected();
         try {
-            FontGenerator.generate(font);
-            lblStatus.setText("Created " + font.getFriendlyName());
+            String filename = FontGenerator.generate(font, unicode);
+            lblStatus.setText("Created " + filename);
         } catch (IOException e) {
             lblStatus.setText("An error has occurred.");
             JOptionPane.showMessageDialog(this.frmHdFontGenerator, e.getMessage());

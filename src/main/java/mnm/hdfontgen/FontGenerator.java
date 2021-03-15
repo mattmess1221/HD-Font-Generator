@@ -1,11 +1,7 @@
 package mnm.hdfontgen;
 
-import java.awt.EventQueue;
-import java.awt.Font;
-import java.awt.image.BufferedImage;
+import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class FontGenerator implements Runnable {
 
@@ -20,36 +16,23 @@ public class FontGenerator implements Runnable {
             e.printStackTrace();
         }
     }
-
-    public static void generate(HDFont font) throws IOException {
-        List<FontTexture> list = new ArrayList<>();
-
-        String desc = font.getFriendlyName();
-
-        if (!quiet)
-            System.out.println("Rendering ascii");
-
-        BufferedImage ascii = AsciiPackUtils.render(font);
-        list.add(new FontTexture("ascii", ascii));
-        if (font.isUnicode()) {
-            for (int i = 0x00; i <= 0xff; i++) {
-                String name = Integer.toString(i, 16);
-                if (i < 0x10) {
-                    name = 0 + name;
-                }
-
-                if (!quiet)
-                    System.out.println("Rendering unicode page " + name);
-
-                BufferedImage page = AsciiPackUtils.render(font, i);
-                list.add(new FontTexture("unicode_page_" + name, page));
-            }
+    public static String generate(HDFont font, boolean unicode) throws IOException {
+        String description = font.getFriendlyName(unicode);
+        FontPack pack = new FontPack(description);
+        pack.addAsciiPage(font);
+        if (unicode) {
+            pack.addUnicodePages(font);
         }
-        if (!quiet)
-            System.out.println("Preparing resource pack.");
 
-        AsciiPackUtils.pack(desc, list);
-        printSuccess(font);
+        if (!quiet)
+            System.out.println("Rendering pages");
+
+        String filename = description + ".zip";
+
+        pack.writeTo(filename);
+
+        printSuccess(filename);
+        return filename;
     }
 
     public static void main(String[] args) throws IOException {
@@ -73,7 +56,7 @@ public class FontGenerator implements Runnable {
                 System.exit(1);
             }
 
-            FontGenerator.generate(new HDFont(Font.decode(name), texSize, unicode));
+            FontGenerator.generate(new HDFont(Font.decode(name), texSize), unicode);
         } else {
             // wrong usage
             printUsage();
@@ -81,9 +64,9 @@ public class FontGenerator implements Runnable {
         }
     }
 
-    private static void printSuccess(HDFont hdfont) {
+    private static void printSuccess(String filename) {
         if (!quiet)
-            System.out.println("Generated font: " + hdfont.getFriendlyName() + ".zip");
+            System.out.println("Generated font at " + filename);
     }
 
     private static void printSizes(String size) {
