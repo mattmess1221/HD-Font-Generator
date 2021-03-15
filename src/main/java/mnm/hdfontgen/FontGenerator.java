@@ -24,8 +24,7 @@ public class FontGenerator implements Runnable {
             pack.addUnicodePages(font);
         }
 
-        if (!quiet)
-            System.out.println("Rendering pages");
+        Log.log("Rendering pages");
 
         String filename = description + ".zip";
 
@@ -36,6 +35,11 @@ public class FontGenerator implements Runnable {
     }
 
     public static void main(String[] args) throws IOException {
+        Log.addLogger(msg -> {
+            if (!quiet) {
+                System.out.println(msg);
+            }
+        });
         if (args.length == 0) {
             // open the gui
             EventQueue.invokeLater(new FontGenerator());
@@ -65,8 +69,7 @@ public class FontGenerator implements Runnable {
     }
 
     private static void printSuccess(String filename) {
-        if (!quiet)
-            System.out.println("Generated font at " + filename);
+        Log.log("Generated font at %s", filename);
     }
 
     private static void printSizes(String size) {

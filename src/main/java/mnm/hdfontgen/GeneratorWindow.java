@@ -116,6 +116,10 @@ public class GeneratorWindow implements ActionListener, ItemListener, Runnable {
         lblStatus = new JLabel("Started");
         lblStatus.setBorder(new BevelBorder(BevelBorder.LOWERED));
         frmHdFontGenerator.getContentPane().add(lblStatus, BorderLayout.SOUTH);
+
+        Log.addLogger((msg) -> {
+            lblStatus.setText(msg);
+        });
     }
 
     private String[] getInstalledFonts() {
