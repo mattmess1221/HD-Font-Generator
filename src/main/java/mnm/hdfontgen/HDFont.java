@@ -5,8 +5,8 @@ import java.awt.Font;
 public class HDFont {
 
     private final Font font;
-    private TextureSize size;
-    private boolean unicode;
+    private final TextureSize size;
+    private final boolean unicode;
 
     public HDFont(Font font) {
         this(font, TextureSize.x32, false);

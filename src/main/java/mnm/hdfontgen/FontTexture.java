@@ -4,8 +4,8 @@ import java.awt.image.BufferedImage;
 
 public class FontTexture {
 
-    private String name;
-    private BufferedImage image;
+    private final String name;
+    private final BufferedImage image;
 
     public FontTexture(String name, BufferedImage image) {
         this.name = name;
@@ -17,7 +17,7 @@ public class FontTexture {
     }
 
     public String getPath() {
-        return String.format("assets/minecraft/textures/font/%s.png", name);
+        return String.format("assets/minecraft/textures/font/%s.png", getName());
     }
 
     public BufferedImage getImage() {

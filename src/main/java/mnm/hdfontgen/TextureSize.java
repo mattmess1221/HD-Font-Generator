@@ -13,7 +13,7 @@ public enum TextureSize {
 
     private final int textureSize;
 
-    private TextureSize(int size) {
+    TextureSize(int size) {
         this.textureSize = size;
     }
 

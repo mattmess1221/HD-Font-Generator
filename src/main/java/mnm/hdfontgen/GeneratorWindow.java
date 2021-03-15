@@ -42,7 +42,7 @@ public class GeneratorWindow implements ActionListener, ItemListener, Runnable {
     private JComboBox<TextureSize> comboBox;
     private JLabel lblDisplay;
     private JLabel lblStatus;
-    private JCheckBox chckbxUnicode;
+    private JCheckBox checkboxUnicode;
     private JButton btnCreate;
 
     public GeneratorWindow() {
@@ -66,10 +66,10 @@ public class GeneratorWindow implements ActionListener, ItemListener, Runnable {
         panel.setBorder(new TitledBorder(null, "Font settings", TitledBorder.LEADING, TitledBorder.TOP, null, null));
         frmHdFontGenerator.getContentPane().add(panel, BorderLayout.CENTER);
         GridBagLayout gbl_panel = new GridBagLayout();
-        gbl_panel.columnWidths = new int[] { 25, 117, 81, 25 };
-        gbl_panel.rowHeights = new int[] { 85, 0, 0, 0, 0, 0, 32, 0 };
-        gbl_panel.columnWeights = new double[] { 0.0, 1.0, 1.0, 0.0 };
-        gbl_panel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, Double.MIN_VALUE };
+        gbl_panel.columnWidths = new int[]{25, 117, 81, 25};
+        gbl_panel.rowHeights = new int[]{85, 0, 0, 0, 0, 0, 32, 0};
+        gbl_panel.columnWeights = new double[]{0.0, 1.0, 1.0, 0.0};
+        gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, Double.MIN_VALUE};
         panel.setLayout(gbl_panel);
 
         lblDisplay = new JLabel("AaBbCcDdEe");
@@ -89,7 +89,7 @@ public class GeneratorWindow implements ActionListener, ItemListener, Runnable {
         gbc_lblFont.gridy = 1;
         panel.add(lblFont, gbc_lblFont);
 
-        choice = new JComboBox<HDFont>(new Vector<>(getInstalledFonts()));
+        choice = new JComboBox<>(new Vector<>(getInstalledFonts()));
         choice.addItemListener(this);
         GridBagConstraints gbc_choice = new GridBagConstraints();
         gbc_choice.fill = GridBagConstraints.BOTH;
@@ -118,13 +118,13 @@ public class GeneratorWindow implements ActionListener, ItemListener, Runnable {
         btnCreate = new JButton("Create");
         btnCreate.addActionListener(this);
 
-        chckbxUnicode = new JCheckBox("Unicode (Experimental)");
-        GridBagConstraints gbc_chckbxUnicode = new GridBagConstraints();
-        gbc_chckbxUnicode.gridwidth = 2;
-        gbc_chckbxUnicode.insets = new Insets(0, 0, 5, 5);
-        gbc_chckbxUnicode.gridx = 1;
-        gbc_chckbxUnicode.gridy = 4;
-        panel.add(chckbxUnicode, gbc_chckbxUnicode);
+        checkboxUnicode = new JCheckBox("Unicode (Experimental)");
+        GridBagConstraints gbc_checkboxUnicode = new GridBagConstraints();
+        gbc_checkboxUnicode.gridwidth = 2;
+        gbc_checkboxUnicode.insets = new Insets(0, 0, 5, 5);
+        gbc_checkboxUnicode.gridx = 1;
+        gbc_checkboxUnicode.gridy = 4;
+        panel.add(checkboxUnicode, gbc_checkboxUnicode);
         GridBagConstraints gbc_btnCreate = new GridBagConstraints();
         gbc_btnCreate.insets = new Insets(0, 0, 0, 5);
         gbc_btnCreate.gridwidth = 2;
@@ -155,7 +155,7 @@ public class GeneratorWindow implements ActionListener, ItemListener, Runnable {
 
     public void itemStateChanged(ItemEvent e) {
         Font f = getChoice().getFont();
-        lblDisplay.setFont(new Font(f.getName(), 0, 24));
+        lblDisplay.setFont(new Font(f.getName(), Font.PLAIN, 24));
     }
 
     @Override
@@ -171,12 +171,12 @@ public class GeneratorWindow implements ActionListener, ItemListener, Runnable {
         lblStatus.setText("Working...");
         btnCreate.setEnabled(false);
 
-        HDFont font = new HDFont(getChoice().getFont(), getTextureSize(), chckbxUnicode.isSelected());
+        HDFont font = new HDFont(getChoice().getFont(), getTextureSize(), checkboxUnicode.isSelected());
         try {
             FontGenerator.generate(font);
             lblStatus.setText("Created " + font.getFriendlyName());
         } catch (IOException e) {
-            lblStatus.setText("An error has occured.");
+            lblStatus.setText("An error has occurred.");
             JOptionPane.showMessageDialog(this.frmHdFontGenerator, e.getMessage());
         } finally {
             btnCreate.setEnabled(true);
