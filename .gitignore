@@ -4,3 +4,4 @@ bin/
 .gradle/
 .project
 .classpath
+.idea/

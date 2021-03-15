@@ -1,10 +1,23 @@
-apply plugin: 'java'
-apply plugin: 'eclipse'
+plugins {
+    id 'application'
+    id "org.ajoberstar.reckon" version "0.13.0"
+}
 
-targetCompatibility = 1.7
-sourceCompatibility = 1.7
+java {
+    targetCompatibility = JavaVersion.VERSION_1_7
+    sourceCompatibility = JavaVersion.VERSION_1_7
+}
 
-archivesBaseName = "HD Font Generator"
-version = "1.2"
+application {
+    // Define the main class for the application.
+    mainClass = 'mnm.hdfontgen.FontGenerator'
+}
 
-jar.manifest.attributes "Main-Class":"mnm.hdfontgen.FontGenerator"
+reckon {
+    scopeFromProp()
+    stageFromProp('milestone', 'rc', 'final')
+}
+
+jar {
+    manifest.attributes 'Main-Class': application.mainClass
+}
