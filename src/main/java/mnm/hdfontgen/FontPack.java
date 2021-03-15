@@ -1,5 +1,6 @@
 package mnm.hdfontgen;
 
+import javax.imageio.ImageIO;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
@@ -44,16 +45,17 @@ public class FontPack {
     public void writeTo(ZipOutputStream zipOut) throws IOException {
 
         // write the pack.mcmeta
+        Log.log("Writing pack.mcmeta");
         zipOut.putNextEntry(new ZipEntry("pack.mcmeta"));
         String packJson = String.format(FontPack.packJson, description);
         zipOut.write(packJson.getBytes(StandardCharsets.UTF_8));
         zipOut.closeEntry();
-        zipOut.flush();
 
         // write al the pages
-        for (FontPage font : pages) {
-            zipOut.putNextEntry(new ZipEntry(font.getPath()));
-            font.writeToStream(zipOut);
+        for (FontPage page : pages) {
+            Log.log("Writing %s", page.getName());
+            zipOut.putNextEntry(new ZipEntry(page.getPath()));
+            ImageIO.write(page.render(), "png", zipOut);
             zipOut.closeEntry();
         }
 

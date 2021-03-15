@@ -1,8 +1,6 @@
 package mnm.hdfontgen;
 
-import javax.imageio.ImageIO;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.awt.image.BufferedImage;
 
 public class FontPage {
 
@@ -16,12 +14,15 @@ public class FontPage {
         this.characters = characters;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public String getPath() {
         return String.format("assets/minecraft/textures/font/%s.png", name);
     }
 
-    public void writeToStream(OutputStream zip) throws IOException {
-        System.out.println("Rendering page " + name);
-        ImageIO.write(font.render(characters), "png", zip);
+    public BufferedImage render() {
+        return font.render(characters);
     }
 }
