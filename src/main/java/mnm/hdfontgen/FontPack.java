@@ -1,5 +1,7 @@
 package mnm.hdfontgen;
 
+import com.google.gson.Gson;
+
 import javax.imageio.ImageIO;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -10,19 +12,19 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class FontPack {
 
     private static final char[][] ascii = loadAsciiTxt();
-    private static final String packJson = loadPackJson();
 
+    private final int packFormat;
     private final String description;
     private final List<FontPage> pages = new ArrayList<>();
 
-    public FontPack(String description) {
+    public FontPack(int packFormat, String description) {
+        this.packFormat = packFormat;
         this.description = description;
     }
 
@@ -43,12 +45,13 @@ public class FontPack {
     }
 
     public void writeTo(ZipOutputStream zipOut) throws IOException {
-
+        Gson gson = new Gson();
         // write the pack.mcmeta
         Log.log("Writing pack.mcmeta");
         zipOut.putNextEntry(new ZipEntry("pack.mcmeta"));
-        String packJson = String.format(FontPack.packJson, description);
-        zipOut.write(packJson.getBytes(StandardCharsets.UTF_8));
+        PackSection section = new PackSection(this.packFormat, this.description);
+        PackJson packJson = new PackJson(section);
+        zipOut.write(gson.toJson(packJson).getBytes(StandardCharsets.UTF_8));
         zipOut.closeEntry();
 
         // write al the pages
@@ -62,6 +65,7 @@ public class FontPack {
         // flush the stream so it writes properly
         zipOut.finish();
     }
+
 
     public void writeTo(String filename) throws IOException {
         try (ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(filename)))) {
@@ -92,18 +96,7 @@ public class FontPack {
         }
     }
 
-    private static String loadPackJson() {
-        // TODO generate with json-simple
-        try {
-            return readInputStream("/pack.mcmeta.json")
-                    .lines()
-                    .collect(Collectors.joining("\n"));
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to read pack.mcmeta template", e);
-        }
-    }
-
-    private static BufferedReader readInputStream(String name) throws IOException {
+    private static BufferedReader readInputStream(String name) {
         InputStream inputStream = FontPack.class.getResourceAsStream(name);
         return new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
     }

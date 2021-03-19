@@ -18,7 +18,7 @@ public class FontGenerator implements Runnable {
     }
     public static String generate(HDFont font, boolean unicode) throws IOException {
         String description = font.getFriendlyName(unicode);
-        FontPack pack = new FontPack(description);
+        FontPack pack = new FontPack(1, description);
         pack.addAsciiPage(font);
         if (unicode) {
             pack.addUnicodePages(font);
