@@ -3,17 +3,23 @@ package mnm.hdfontgen;
 import com.google.gson.Gson;
 
 import javax.imageio.ImageIO;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.Writer;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import java.util.Map;
 
 public class FontPack {
 
@@ -44,32 +50,34 @@ public class FontPack {
         }
     }
 
-    public void writeTo(ZipOutputStream zipOut) throws IOException {
-        Gson gson = new Gson();
+    public void writeTo(FileSystem zipFs) throws IOException {
         // write the pack.mcmeta
         Log.log("Writing pack.mcmeta");
-        zipOut.putNextEntry(new ZipEntry("pack.mcmeta"));
-        PackSection section = new PackSection(this.packFormat, this.description);
-        PackJson packJson = new PackJson(section);
-        zipOut.write(gson.toJson(packJson).getBytes(StandardCharsets.UTF_8));
-        zipOut.closeEntry();
+        try (Writer writer = Files.newBufferedWriter(zipFs.getPath("pack.mcmeta"))) {
+            PackSection section = new PackSection(this.packFormat, this.description);
+            PackJson packJson = new PackJson(section);
+            new Gson().toJson(packJson, writer);
+        }
 
         // write al the pages
         for (FontPage page : pages) {
             Log.log("Writing %s", page.getName());
-            zipOut.putNextEntry(new ZipEntry(page.getPath()));
-            ImageIO.write(page.render(), "png", zipOut);
-            zipOut.closeEntry();
+            Path pagePath = zipFs.getPath(page.getPath());
+            Files.createDirectories(pagePath.getParent());
+            try (OutputStream out = Files.newOutputStream(zipFs.getPath(page.getPath()))) {
+                ImageIO.write(page.render(), "png", out);
+            }
         }
-
-        // flush the stream so it writes properly
-        zipOut.finish();
     }
 
-
     public void writeTo(String filename) throws IOException {
-        try (ZipOutputStream zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(filename)))) {
-            this.writeTo(zipOut);
+        Path file = Paths.get(filename);
+        URI uri = URI.create("jar:" + file.toUri());
+        Map<String, String> env = new HashMap<>();
+        env.put("create", "true");
+
+        try (FileSystem fs = FileSystems.newFileSystem(uri, env)) {
+            this.writeTo(fs);
         }
     }
 
@@ -86,17 +94,16 @@ public class FontPack {
     }
 
     private static char[][] loadAsciiTxt() {
-        try {
-            return readInputStream("/ascii.txt")
-                    .lines()
+        try (BufferedReader reader = readResource("/ascii.txt")) {
+            return reader.lines()
                     .map(String::toCharArray)
                     .toArray(char[][]::new);
         } catch (Exception e) {
-            throw new RuntimeException("Ascii file is invalid.", e);
+            throw new RuntimeException("Resource 'ascii.txt' could not be read", e);
         }
     }
 
-    private static BufferedReader readInputStream(String name) {
+    private static BufferedReader readResource(String name) {
         InputStream inputStream = FontPack.class.getResourceAsStream(name);
         return new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
     }
