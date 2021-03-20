@@ -158,8 +158,10 @@ public class GeneratorWindow implements ActionListener, ItemListener, Runnable {
             String filename = FontGenerator.generate(font, unicode);
             lblStatus.setText("Created " + filename);
         } catch (IOException e) {
-            lblStatus.setText("An error has occurred.");
-            JOptionPane.showMessageDialog(this.frmHdFontGenerator, e.getMessage());
+            e.printStackTrace();
+            lblStatus.setText("An error has occurred.!");
+            // TODO create log file so users can check the log
+            JOptionPane.showMessageDialog(this.frmHdFontGenerator, "An error has occurred.\nCheck the log for details.", "Error!", JOptionPane.ERROR_MESSAGE);
         } finally {
             btnCreate.setEnabled(true);
         }
