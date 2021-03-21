@@ -5,10 +5,8 @@ import com.google.gson.Gson;
 import javax.imageio.ImageIO;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Writer;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
@@ -19,7 +17,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FontPack {
 
@@ -53,9 +50,9 @@ public class FontPack {
     public void writeTo(FileSystem zipFs) throws IOException {
         // write the pack.mcmeta
         Log.log("Writing pack.mcmeta");
-        try (Writer writer = Files.newBufferedWriter(zipFs.getPath("pack.mcmeta"))) {
-            PackSection section = new PackSection(this.packFormat, this.description);
-            PackJson packJson = new PackJson(section);
+        try (var writer = Files.newBufferedWriter(zipFs.getPath("pack.mcmeta"))) {
+            var section = new PackSection(this.packFormat, this.description);
+            var packJson = new PackJson(section);
             new Gson().toJson(packJson, writer);
         }
 
@@ -71,19 +68,19 @@ public class FontPack {
     }
 
     public void writeTo(String filename) throws IOException {
-        Path file = Paths.get(filename);
-        URI uri = URI.create("jar:" + file.toUri());
-        Map<String, String> env = new HashMap<>();
+        var file = Paths.get(filename);
+        var uri = URI.create("jar:" + file.toUri());
+        var env = new HashMap<String, String>();
         env.put("create", "true");
 
-        try (FileSystem fs = FileSystems.newFileSystem(uri, env)) {
+        try (var fs = FileSystems.newFileSystem(uri, env)) {
             this.writeTo(fs);
         }
     }
 
     private static char[][] getUnicodeTable(int tableIndex) {
         int a = tableIndex << 8;
-        char[][] table = new char[16][16];
+        var table = new char[16][16];
         for (int y = 0; y < 16; y++) {
             int b = y << 4;
             for (int x = 0; x < 16; x++) {
@@ -94,7 +91,7 @@ public class FontPack {
     }
 
     private static char[][] loadAsciiTxt() {
-        try (BufferedReader reader = readResource("/ascii.txt")) {
+        try (var reader = readResource("/ascii.txt")) {
             return reader.lines()
                     .map(String::toCharArray)
                     .toArray(char[][]::new);
@@ -104,7 +101,7 @@ public class FontPack {
     }
 
     private static BufferedReader readResource(String name) {
-        InputStream inputStream = FontPack.class.getResourceAsStream(name);
+        var inputStream = FontPack.class.getResourceAsStream(name);
         return new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
     }
 }

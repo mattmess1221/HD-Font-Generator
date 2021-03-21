@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class HDFont {
 
@@ -25,8 +24,8 @@ public class HDFont {
     public BufferedImage render(char[][] chars) {
         int size = this.size.getTextureSize() / 2;
         int yOffset = size - size / 4;
-        BufferedImage image = new BufferedImage(size * 16, size * 16, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics = (Graphics2D) image.getGraphics();
+        var image = new BufferedImage(size * 16, size * 16, BufferedImage.TYPE_INT_ARGB);
+        var graphics = (Graphics2D) image.getGraphics();
         for (int y = 0; y < 16; y++) {
             for (int x = 0; x < 16; x++) {
                 char charToRender = chars[y][x];
@@ -43,7 +42,7 @@ public class HDFont {
 
     private Font getFontForChar(char ch) {
         final int size = this.size.getTextureSize() / 2;
-        Font f = (font.canDisplay(ch) ? font : fallbackFont).deriveFont(Font.PLAIN, size);
+        var f = (font.canDisplay(ch) ? font : fallbackFont).deriveFont(Font.PLAIN, size);
         f = f.deriveFont(Font.PLAIN, size);
 
         String stringToCheck = Character.toString(ch);
@@ -57,12 +56,12 @@ public class HDFont {
     }
 
     private static double getStringHeight(Font f, String string) {
-        FontRenderContext context = new FontRenderContext(f.getTransform(), false, false);
+        var context = new FontRenderContext(f.getTransform(), false, false);
         return f.getStringBounds(string, context).getHeight();
     }
 
     private static Font loadDefaultFont() {
-        try (InputStream in = HDFont.class.getResourceAsStream("/unifont-7.0.06.ttf")) {
+        try (var in = HDFont.class.getResourceAsStream("/unifont-7.0.06.ttf")) {
             return Font.createFont(Font.TRUETYPE_FONT, in);
         } catch (FontFormatException | IOException e) {
             throw new RuntimeException("Unable to read Unifont fallback font", e);

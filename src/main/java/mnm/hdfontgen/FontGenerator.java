@@ -10,15 +10,16 @@ public class FontGenerator implements Runnable {
     @Override
     public void run() {
         try {
-            GeneratorWindow window = GeneratorWindow.instance = new GeneratorWindow();
+            var window = GeneratorWindow.instance = new GeneratorWindow();
             window.frmHdFontGenerator.setVisible(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     public static String generate(HDFont font, boolean unicode) throws IOException {
-        String description = font.getFriendlyName(unicode);
-        FontPack pack = new FontPack(1, description);
+        var description = font.getFriendlyName(unicode);
+        var pack = new FontPack(1, description);
         pack.addAsciiPage(font);
         if (unicode) {
             pack.addUnicodePages(font);
@@ -26,15 +27,15 @@ public class FontGenerator implements Runnable {
 
         Log.log("Rendering pages");
 
-        String filename = description + ".zip";
+        var filename = description + ".zip";
 
         pack.writeTo(filename);
 
-        printSuccess(filename);
+        Log.log("Generated font at %s", filename);
         return filename;
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         Log.addLogger(msg -> {
             if (!quiet) {
                 System.out.println(msg);
@@ -43,44 +44,73 @@ public class FontGenerator implements Runnable {
         if (args.length == 0) {
             // open the gui
             EventQueue.invokeLater(new FontGenerator());
-        } else if (args.length == 2 || args.length == 3) {
+        } else {
+            try {
+                runCli(args);
+            } catch (SystemExit e) {
+                e.exit();
+            }
+        }
+    }
+
+    private static void runCli(String[] args) throws SystemExit {
+        if (args.length == 2 || args.length == 3) {
             // headless
-            String name = args[0].replace('_', ' ');
-            String size = args[1];
-            boolean unicode = false;
+            var name = args[0].replace('_', ' ');
+            var size = args[1];
+            var unicode = false;
             if (args.length == 3) {
                 // flags
                 unicode = args[2].contains("u");
                 quiet = args[2].contains("q");
             }
 
-            TextureSize texSize = TextureSize.forSize(Integer.parseInt(size));
-            if (texSize == null) {
-                printSizes(size);
-                System.exit(1);
-            }
+            var texSize = TextureSize.forSize(Integer.parseInt(size))
+                    .orElseThrow(() -> printSizes(size));
 
-            FontGenerator.generate(new HDFont(Font.decode(name), texSize), unicode);
+            try {
+                FontGenerator.generate(new HDFont(Font.decode(name), texSize), unicode);
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.exit(3);
+            }
         } else {
             // wrong usage
-            printUsage();
-            System.exit(1);
+            throw printUsage();
         }
     }
 
-    private static void printSuccess(String filename) {
-        Log.log("Generated font at %s", filename);
+    private static SystemExit printSizes(String size) {
+        return new SystemExit(2,
+                size + " is not a supported texture size.",
+                "Supported values are: " + TextureSize.getSizes()
+        );
     }
 
-    private static void printSizes(String size) {
-        System.out.println(size + " is not a supported texture size.\n" + " Supported values are: "
-                + TextureSize.getSizes());
+    private static SystemExit printUsage() {
+        return new SystemExit(1,
+                "Command Line Usage: <font name> <texture size> [flags]",
+                "Flags:",
+                "    u    Export unicode",
+                "    q    Quiet"
+        );
     }
 
-    private static void printUsage() {
-        System.out.println("Command Line Usage: <font name> <texture size> [flags]");
-        System.out.println("Flags:");
-        System.out.println("    u    Export unicode");
-        System.out.println("    q    Quiet");
+    private static class SystemExit extends Exception {
+        private final int code;
+
+        SystemExit(int code, String message) {
+            super(message);
+            this.code = code;
+        }
+
+        SystemExit(int code, String... message) {
+            this(code, String.join("\n", message));
+        }
+
+        void exit() {
+            System.out.println(this.getMessage());
+            System.exit(this.code);
+        }
     }
 }

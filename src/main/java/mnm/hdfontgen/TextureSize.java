@@ -1,7 +1,9 @@
 package mnm.hdfontgen;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public enum TextureSize {
 
@@ -21,20 +23,15 @@ public enum TextureSize {
         return textureSize;
     }
 
-    public static TextureSize forSize(int size) {
-        for (TextureSize tex : values()) {
-            if (tex.getTextureSize() == size) {
-                return tex;
-            }
-        }
-        return null;
+    public static Optional<TextureSize> forSize(int size) {
+        return Arrays.stream(values())
+                .filter((tex) -> tex.getTextureSize() == size)
+                .findFirst();
     }
 
     public static List<Integer> getSizes() {
-        List<Integer> list = new ArrayList<>();
-        for (TextureSize tex : values()) {
-            list.add(tex.getTextureSize());
-        }
-        return list;
+        return Arrays.stream(values())
+                .map(TextureSize::getTextureSize)
+                .collect(Collectors.toList());
     }
 }
