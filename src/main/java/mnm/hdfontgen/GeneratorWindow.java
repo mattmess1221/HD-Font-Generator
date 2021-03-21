@@ -144,8 +144,7 @@ public class GeneratorWindow {
         var font = new HDFont(getChoiceFont(), getTextureSize());
         var unicode = checkboxUnicode.isSelected();
         try {
-            String filename = FontGenerator.generate(font, unicode);
-            lblStatus.setText("Created " + filename);
+            FontGenerator.generate(font, unicode);
         } catch (IOException e) {
             e.printStackTrace();
             lblStatus.setText("An error has occurred.!");

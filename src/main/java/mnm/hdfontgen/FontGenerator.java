@@ -1,5 +1,8 @@
 package mnm.hdfontgen;
 
+import mnm.hdfontgen.legacy.LegacyFontGenerator;
+import mnm.hdfontgen.pack.GeneratorSettings;
+
 import java.awt.*;
 import java.io.IOException;
 
@@ -17,22 +20,17 @@ public class FontGenerator implements Runnable {
         }
     }
 
-    public static String generate(HDFont font, boolean unicode) throws IOException {
-        var description = font.getFriendlyName(unicode);
-        var pack = new FontPack(1, description);
-        pack.addAsciiPage(font);
-        if (unicode) {
-            pack.addUnicodePages(font);
-        }
+    public static void generate(HDFont font, boolean unicode) throws IOException {
+        var settings = new GeneratorSettings();
+        settings.font = font;
+        settings.unicode = unicode;
+        var generator = new LegacyFontGenerator(1);
 
+        var pack = generator.generate(settings);
+        var filename = pack.getDescription() + ".zip";
         Log.log("Rendering pages");
-
-        var filename = description + ".zip";
-
         pack.writeTo(filename);
-
         Log.log("Generated font at %s", filename);
-        return filename;
     }
 
     public static void main(String[] args) {
