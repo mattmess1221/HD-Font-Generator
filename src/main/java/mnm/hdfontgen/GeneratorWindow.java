@@ -1,5 +1,7 @@
 package mnm.hdfontgen;
 
+import mnm.hdfontgen.pack.PackFormat;
+
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
@@ -17,6 +19,7 @@ public class GeneratorWindow {
     JFrame frmHdFontGenerator;
     private JComboBox<String> choiceFont;
     private JComboBox<TextureSize> comboBox;
+    private JComboBox<PackFormat> choiceFormat;
     private JLabel lblDisplay;
     private JLabel lblStatus;
     private JCheckBox checkboxUnicode;
@@ -57,12 +60,14 @@ public class GeneratorWindow {
         gbc_lblDisplay.gridy = 0;
         panel.add(lblDisplay, gbc_lblDisplay);
 
+        var y = 0;
+
         var lblFont = new JLabel("Font:");
         var gbc_lblFont = new GridBagConstraints();
         gbc_lblFont.anchor = GridBagConstraints.WEST;
         gbc_lblFont.insets = new Insets(0, 0, 5, 5);
         gbc_lblFont.gridx = 1;
-        gbc_lblFont.gridy = 1;
+        gbc_lblFont.gridy = ++y;
         panel.add(lblFont, gbc_lblFont);
 
         choiceFont = new JComboBox<>(getInstalledFonts());
@@ -75,14 +80,14 @@ public class GeneratorWindow {
         gbc_choice.gridwidth = 2;
         gbc_choice.insets = new Insets(0, 0, 5, 5);
         gbc_choice.gridx = 1;
-        gbc_choice.gridy = 2;
+        gbc_choice.gridy = ++y;
         panel.add(choiceFont, gbc_choice);
 
         var lblTextureSize = new JLabel("Texture Size:");
         var gbc_lblTextureSize = new GridBagConstraints();
         gbc_lblTextureSize.insets = new Insets(0, 0, 5, 5);
         gbc_lblTextureSize.gridx = 1;
-        gbc_lblTextureSize.gridy = 3;
+        gbc_lblTextureSize.gridy = ++y;
         panel.add(lblTextureSize, gbc_lblTextureSize);
 
         comboBox = new JComboBox<>();
@@ -91,29 +96,48 @@ public class GeneratorWindow {
         gbc_comboBox.insets = new Insets(0, 0, 5, 5);
         gbc_comboBox.fill = GridBagConstraints.HORIZONTAL;
         gbc_comboBox.gridx = 2;
-        gbc_comboBox.gridy = 3;
+        gbc_comboBox.gridy = y;
         panel.add(comboBox, gbc_comboBox);
 
-        btnCreate = new JButton("Create");
-        btnCreate.addActionListener(e -> this.startThread());
+        var lblFormat = new JLabel("Pack Format:");
+        var gbc_lblFormat = new GridBagConstraints();
+        gbc_lblFormat.insets = new Insets(0, 0, 5, 5);
+        gbc_lblFormat.gridx = 1;
+        gbc_lblFormat.gridy = ++y;
+        panel.add(lblFormat, gbc_lblFormat);
+
+        choiceFormat = new JComboBox<>();
+        choiceFormat.setModel(new DefaultComboBoxModel<>(PackFormat.values()));
+        choiceFormat.setSelectedItem(PackFormat.LATEST);
+        var gbc_choiceFormat = new GridBagConstraints();
+        gbc_choiceFormat.insets = new Insets(0, 0, 5, 5);
+        gbc_choiceFormat.fill = GridBagConstraints.HORIZONTAL;
+        gbc_choiceFormat.gridx = 2;
+        gbc_choiceFormat.gridy = y;
+        panel.add(choiceFormat, gbc_choiceFormat);
 
         checkboxUnicode = new JCheckBox("Unicode (Experimental)");
         var gbc_checkboxUnicode = new GridBagConstraints();
         gbc_checkboxUnicode.gridwidth = 2;
         gbc_checkboxUnicode.insets = new Insets(0, 0, 5, 5);
         gbc_checkboxUnicode.gridx = 1;
-        gbc_checkboxUnicode.gridy = 4;
+        gbc_checkboxUnicode.gridy = ++y;
         panel.add(checkboxUnicode, gbc_checkboxUnicode);
+
+        btnCreate = new JButton("Create");
+        btnCreate.addActionListener(e -> this.startThread());
         var gbc_btnCreate = new GridBagConstraints();
         gbc_btnCreate.insets = new Insets(0, 0, 0, 5);
         gbc_btnCreate.gridwidth = 2;
         gbc_btnCreate.gridx = 1;
-        gbc_btnCreate.gridy = 6;
+        gbc_btnCreate.gridy = ++y;
         panel.add(btnCreate, gbc_btnCreate);
 
         lblStatus = new JLabel("Started");
         lblStatus.setBorder(new BevelBorder(BevelBorder.LOWERED));
         frmHdFontGenerator.getContentPane().add(lblStatus, BorderLayout.SOUTH);
+
+        frmHdFontGenerator.pack();
 
         Log.addLogger(lblStatus::setText);
     }
@@ -130,6 +154,10 @@ public class GeneratorWindow {
         return (TextureSize) comboBox.getSelectedItem();
     }
 
+    private PackFormat getPackFormat() {
+        return (PackFormat) choiceFormat.getSelectedItem();
+    }
+
     private void startThread() {
         if (thread == null || !thread.isAlive()) {
             thread = new Thread(this::run);
@@ -141,10 +169,11 @@ public class GeneratorWindow {
         lblStatus.setText("Working...");
         btnCreate.setEnabled(false);
 
+        var format = getPackFormat();
         var font = new HDFont(getChoiceFont(), getTextureSize());
         var unicode = checkboxUnicode.isSelected();
         try {
-            FontGenerator.generate(font, unicode);
+            FontGenerator.generate(format, font, unicode);
         } catch (IOException e) {
             e.printStackTrace();
             lblStatus.setText("An error has occurred.!");
