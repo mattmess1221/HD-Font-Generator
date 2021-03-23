@@ -24,7 +24,7 @@ public class FontPack {
     public void writeTo(FileSystem zipFs) throws IOException {
         // write all the pages
         for (Resource page : resources) {
-            Path pagePath = zipFs.getPath(page.getPath());
+            Path pagePath = zipFs.getPath(page.getPath().getFileLocation());
             Log.log("Writing %s", pagePath.getFileName());
             if (pagePath.getParent() != null) {
                 Files.createDirectories(pagePath.getParent());

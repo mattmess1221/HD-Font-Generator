@@ -2,24 +2,25 @@ package mnm.hdfontgen.legacy;
 
 import mnm.hdfontgen.HDFont;
 import mnm.hdfontgen.pack.AbstractBitmapResource;
+import mnm.hdfontgen.pack.ResourcePath;
 
 import java.awt.image.BufferedImage;
 
 public class LegacyBitmapFontResource extends AbstractBitmapResource {
 
-    private final String name;
+    private final ResourcePath path;
     private final HDFont font;
     private final char[][] characters;
 
-    public LegacyBitmapFontResource(String name, HDFont font, char[][] characters) {
-        this.name = name;
+    public LegacyBitmapFontResource(ResourcePath path, HDFont font, char[][] characters) {
+        this.path = path;
         this.font = font;
         this.characters = characters;
     }
 
     @Override
-    public String getPath() {
-        return String.format("assets/minecraft/textures/font/%s.png", name);
+    public ResourcePath getPath() {
+        return this.path;
     }
 
     @Override

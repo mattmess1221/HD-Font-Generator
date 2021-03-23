@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public interface Resource {
-    String getPath();
+    ZipPath getPath();
 
     void writeTo(Path path) throws IOException;
 }

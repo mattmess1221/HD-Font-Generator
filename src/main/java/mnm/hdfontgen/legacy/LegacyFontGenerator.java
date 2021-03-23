@@ -5,6 +5,7 @@ import mnm.hdfontgen.HDFont;
 import mnm.hdfontgen.pack.GeneratorSettings;
 import mnm.hdfontgen.pack.PackGenerator;
 import mnm.hdfontgen.pack.PackJson;
+import mnm.hdfontgen.pack.ResourcePath;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -17,15 +18,20 @@ public class LegacyFontGenerator implements PackGenerator {
     public LegacyFontGenerator() {
     }
 
+    private static LegacyBitmapFontResource createBitmap(String name, HDFont font, char[][] characters) {
+        ResourcePath path = new ResourcePath(String.format("textures/font/%s.png", name));
+        return new LegacyBitmapFontResource(path, font, characters);
+    }
+
     private static void addAsciiPage(FontPack pack, HDFont font) {
-        pack.addResource(new LegacyBitmapFontResource("ascii", font, ascii));
+        pack.addResource(createBitmap("ascii", font, ascii));
     }
 
     private void addUnicodePages(FontPack pack, HDFont font) {
         for (int pageIndex = 0x00; pageIndex <= 0xff; pageIndex++) {
             char[][] charTable = getUnicodeTable(pageIndex);
             String name = String.format("unicode_page_%02x", pageIndex);
-            pack.addResource(new LegacyBitmapFontResource(name, font, charTable));
+            pack.addResource(createBitmap(name, font, charTable));
         }
     }
 

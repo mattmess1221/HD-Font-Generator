@@ -11,8 +11,8 @@ public class PackJson extends AbstractJsonResource {
     }
 
     @Override
-    public String getPath() {
-        return "pack.mcmeta";
+    public ZipPath getPath() {
+        return () -> "pack.mcmeta";
     }
 
     private static class PackSection {
