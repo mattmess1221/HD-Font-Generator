@@ -1,5 +1,6 @@
 package mnm.hdfontgen.pack;
 
+import mnm.hdfontgen.HDFont;
 import mnm.hdfontgen.TextureSize;
 
 import java.awt.*;
@@ -14,7 +15,6 @@ public class GeneratorSettings {
 
     public GeneratorSettings(Font font) {
         this.font = font;
-
     }
 
     public String getDescription() {
@@ -26,5 +26,13 @@ public class GeneratorSettings {
             description = String.format("%s %s%s for Minecraft %s", fontName, size, withUnicode, versions);
         }
         return description;
+    }
+
+    public PackJson getPackJson() {
+        return new PackJson(format.getFormat(), getDescription());
+    }
+
+    public HDFont getFont() {
+        return new HDFont(font, size);
     }
 }

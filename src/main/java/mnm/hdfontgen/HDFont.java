@@ -17,14 +17,17 @@ public class HDFont {
         this.size = size;
     }
 
-    public BufferedImage render(char[][] chars) {
+    public BufferedImage render(String[] chars) {
         int size = this.size.getTextureSize() / 2;
         int yOffset = size - size / 4;
-        var image = new BufferedImage(size * 16, size * 16, BufferedImage.TYPE_INT_ARGB);
+        var image = new BufferedImage(size * chars[0].length(), size * chars.length, BufferedImage.TYPE_INT_ARGB);
         var graphics = (Graphics2D) image.getGraphics();
-        for (int y = 0; y < 16; y++) {
-            for (int x = 0; x < 16; x++) {
-                char charToRender = chars[y][x];
+        for (int y = 0; y < chars.length; y++) {
+            for (int x = 0; x < chars[y].length(); x++) {
+                char charToRender = chars[y].charAt(x);
+                if (charToRender == '\0' && x != 0 && y != 0) {
+                    continue;
+                }
                 int xPos = x * size;
                 int yPos = y * size;
                 graphics.setClip(xPos, yPos, size, size);

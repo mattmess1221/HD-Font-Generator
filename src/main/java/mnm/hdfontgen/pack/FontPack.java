@@ -17,8 +17,14 @@ public class FontPack {
 
     private final List<Resource> resources = new ArrayList<>();
 
-    public void addResource(Resource page) {
-        this.resources.add(page);
+    public void addResource(Resource resource) {
+        this.resources.add(resource);
+    }
+
+    public void addResources(Resource[] resources) {
+        for (Resource res : resources) {
+            this.addResource(res);
+        }
     }
 
     public void writeTo(FileSystem zipFs) throws IOException {
