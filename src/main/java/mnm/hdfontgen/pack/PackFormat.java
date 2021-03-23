@@ -26,12 +26,16 @@ public enum PackFormat {
         this.factory = factory;
     }
 
-    public PackGenerator createGenerator() {
-        return factory.create(this.format);
+    public int getFormat() {
+        return format;
     }
 
     public String getVersionRange() {
         return String.format("%s-%s", minVersion, maxVersion);
+    }
+
+    public PackGeneratorFactory getFactory() {
+        return factory;
     }
 
     @Override

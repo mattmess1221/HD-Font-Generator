@@ -1,5 +1,6 @@
 package mnm.hdfontgen;
 
+import mnm.hdfontgen.pack.GeneratorSettings;
 import mnm.hdfontgen.pack.PackFormat;
 
 import javax.swing.*;
@@ -169,11 +170,13 @@ public class GeneratorWindow {
         lblStatus.setText("Working...");
         btnCreate.setEnabled(false);
 
-        var format = getPackFormat();
-        var font = new HDFont(getChoiceFont(), getTextureSize());
-        var unicode = checkboxUnicode.isSelected();
+        var settings = new GeneratorSettings(getChoiceFont());
+        settings.size = getTextureSize();
+        settings.format = getPackFormat();
+        settings.unicode = checkboxUnicode.isSelected();
+
         try {
-            FontGenerator.generate(format, font, unicode);
+            FontGenerator.generate(settings);
         } catch (IOException e) {
             e.printStackTrace();
             lblStatus.setText("An error has occurred.!");

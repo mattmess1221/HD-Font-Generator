@@ -1,10 +1,11 @@
 package mnm.hdfontgen.legacy;
 
 import mnm.hdfontgen.HDFont;
+import mnm.hdfontgen.pack.AbstractBitmapResource;
 
 import java.awt.image.BufferedImage;
 
-public class LegacyBitmapFontResource extends LegacyBitmapResource {
+public class LegacyBitmapFontResource extends AbstractBitmapResource {
 
     private final String name;
     private final HDFont font;

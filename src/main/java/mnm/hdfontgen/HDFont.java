@@ -17,10 +17,6 @@ public class HDFont {
         this.size = size;
     }
 
-    public String getFriendlyName(boolean unicode) {
-        return String.format("%s %s%s", font.getFontName(), size, unicode ? " with unicode" : "");
-    }
-
     public BufferedImage render(char[][] chars) {
         int size = this.size.getTextureSize() / 2;
         int yOffset = size - size / 4;

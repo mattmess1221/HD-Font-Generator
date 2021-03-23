@@ -20,14 +20,11 @@ public class FontGenerator implements Runnable {
         }
     }
 
-    public static void generate(PackFormat format, HDFont font, boolean unicode) throws IOException {
-        var settings = new GeneratorSettings();
-        settings.font = font;
-        settings.unicode = unicode;
-        var generator = format.createGenerator();
-
+    public static void generate(GeneratorSettings settings) throws IOException {
+        var desc = settings.getDescription();
+        var generator = settings.format.getFactory().create();
         var pack = generator.generate(settings);
-        var filename = String.format("%s for Minecraft %s.zip", pack.getDescription(), format.getVersionRange());
+        var filename = String.format("%s.zip", desc);
         Log.log("Rendering pages");
         pack.writeTo(filename);
         Log.log("Generated font at %s", filename);
@@ -54,26 +51,24 @@ public class FontGenerator implements Runnable {
     private static void runCli(String[] args) throws SystemExit {
         if (args.length >= 2 && args.length <= 4) {
             // headless
-            var name = args[0].replace('_', ' ');
+            var font = Font.decode(args[0]);
+            var settings = new GeneratorSettings(font);
             var size = args[1];
-            var unicode = false;
-            var packFormat = PackFormat.LATEST;
+            settings.size = TextureSize.forSize(Integer.parseInt(size))
+                    .orElseThrow(() -> printSizes(size));
             if (args.length >= 3) {
                 // flags, use any string to bypass
-                unicode = args[2].contains("u");
+                settings.unicode = args[2].contains("u");
                 quiet = args[2].contains("q");
             }
             if (args.length == 4) {
                 // pack format
                 var formatNumber = Integer.parseInt(args[3]);
-                packFormat = PackFormat.values()[formatNumber];
+                settings.format = PackFormat.values()[formatNumber];
             }
 
-            var texSize = TextureSize.forSize(Integer.parseInt(size))
-                    .orElseThrow(() -> printSizes(size));
-
             try {
-                FontGenerator.generate(packFormat, new HDFont(Font.decode(name), texSize), unicode);
+                FontGenerator.generate(settings);
             } catch (IOException e) {
                 e.printStackTrace();
                 System.exit(3);

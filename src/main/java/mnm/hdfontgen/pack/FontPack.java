@@ -15,18 +15,7 @@ import java.util.List;
 
 public class FontPack {
 
-    private final String description;
     private final List<Resource> resources = new ArrayList<>();
-
-    public FontPack(int packFormat, String description) {
-        this.description = description;
-
-        this.addResource(new PackJson(packFormat, description));
-    }
-
-    public String getDescription() {
-        return description;
-    }
 
     public void addResource(Resource page) {
         this.resources.add(page);

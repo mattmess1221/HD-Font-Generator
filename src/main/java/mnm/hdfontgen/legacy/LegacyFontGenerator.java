@@ -4,6 +4,7 @@ import mnm.hdfontgen.pack.FontPack;
 import mnm.hdfontgen.HDFont;
 import mnm.hdfontgen.pack.GeneratorSettings;
 import mnm.hdfontgen.pack.PackGenerator;
+import mnm.hdfontgen.pack.PackJson;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -12,10 +13,8 @@ import java.nio.charset.StandardCharsets;
 public class LegacyFontGenerator implements PackGenerator {
 
     private static final char[][] ascii = loadAsciiTxt();
-    private final int packFormat;
 
-    public LegacyFontGenerator(int packFormat) {
-        this.packFormat = packFormat;
+    public LegacyFontGenerator() {
     }
 
     private static void addAsciiPage(FontPack pack, HDFont font) {
@@ -32,12 +31,14 @@ public class LegacyFontGenerator implements PackGenerator {
 
     @Override
     public FontPack generate(GeneratorSettings settings) {
-        String desc = settings.font.getFriendlyName(settings.unicode);
-        FontPack pack = new FontPack(this.packFormat, desc);
+        FontPack pack = new FontPack();
+        pack.addResource(new PackJson(settings.format.getFormat(), settings.getDescription()));
 
-        addAsciiPage(pack, settings.font);
+        var hdfont = new HDFont(settings.font, settings.size);
+
+        addAsciiPage(pack, hdfont);
         if (settings.unicode) {
-            addUnicodePages(pack, settings.font);
+            addUnicodePages(pack, hdfont);
         }
 
         return pack;

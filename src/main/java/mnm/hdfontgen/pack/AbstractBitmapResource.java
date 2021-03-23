@@ -1,6 +1,4 @@
-package mnm.hdfontgen.legacy;
-
-import mnm.hdfontgen.pack.Resource;
+package mnm.hdfontgen.pack;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -8,7 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public abstract class LegacyBitmapResource implements Resource {
+public abstract class AbstractBitmapResource implements Resource {
 
     protected abstract BufferedImage render();
 
