@@ -30,6 +30,27 @@ public class GeneratorWindow {
         initialize();
     }
 
+    private static <T> JComboBox<T> createComboBox(JPanel panel, String labelString, T[] items, int y) {
+
+        var label = new JLabel(labelString);
+        var gbc_label = new GridBagConstraints();
+        gbc_label.insets = new Insets(0, 0, 5, 5);
+        gbc_label.gridx = 1;
+        gbc_label.gridy = y;
+        panel.add(label, gbc_label);
+
+        JComboBox<T> comboBox = new JComboBox<>();
+        comboBox.setModel(new DefaultComboBoxModel<>(items));
+        var gbc_comboBox = new GridBagConstraints();
+        gbc_comboBox.insets = new Insets(0, 0, 5, 5);
+        gbc_comboBox.fill = GridBagConstraints.HORIZONTAL;
+        gbc_comboBox.gridx = 2;
+        gbc_comboBox.gridy = y;
+        panel.add(comboBox, gbc_comboBox);
+
+        return comboBox;
+    }
+
     private void initialize() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -84,38 +105,9 @@ public class GeneratorWindow {
         gbc_choice.gridy = ++y;
         panel.add(choiceFont, gbc_choice);
 
-        var lblTextureSize = new JLabel("Texture Size:");
-        var gbc_lblTextureSize = new GridBagConstraints();
-        gbc_lblTextureSize.insets = new Insets(0, 0, 5, 5);
-        gbc_lblTextureSize.gridx = 1;
-        gbc_lblTextureSize.gridy = ++y;
-        panel.add(lblTextureSize, gbc_lblTextureSize);
-
-        comboBox = new JComboBox<>();
-        comboBox.setModel(new DefaultComboBoxModel<>(TextureSize.values()));
-        var gbc_comboBox = new GridBagConstraints();
-        gbc_comboBox.insets = new Insets(0, 0, 5, 5);
-        gbc_comboBox.fill = GridBagConstraints.HORIZONTAL;
-        gbc_comboBox.gridx = 2;
-        gbc_comboBox.gridy = y;
-        panel.add(comboBox, gbc_comboBox);
-
-        var lblFormat = new JLabel("Pack Format:");
-        var gbc_lblFormat = new GridBagConstraints();
-        gbc_lblFormat.insets = new Insets(0, 0, 5, 5);
-        gbc_lblFormat.gridx = 1;
-        gbc_lblFormat.gridy = ++y;
-        panel.add(lblFormat, gbc_lblFormat);
-
-        choiceFormat = new JComboBox<>();
-        choiceFormat.setModel(new DefaultComboBoxModel<>(PackFormat.values()));
+        comboBox = createComboBox(panel, "Texture Size:", TextureSize.values(), ++y);
+        choiceFormat = createComboBox(panel, "Pack Format:", PackFormat.values(), ++y);
         choiceFormat.setSelectedItem(PackFormat.LATEST);
-        var gbc_choiceFormat = new GridBagConstraints();
-        gbc_choiceFormat.insets = new Insets(0, 0, 5, 5);
-        gbc_choiceFormat.fill = GridBagConstraints.HORIZONTAL;
-        gbc_choiceFormat.gridx = 2;
-        gbc_choiceFormat.gridy = y;
-        panel.add(choiceFormat, gbc_choiceFormat);
 
         checkboxUnicode = new JCheckBox("Unicode (Experimental)");
         var gbc_checkboxUnicode = new GridBagConstraints();
