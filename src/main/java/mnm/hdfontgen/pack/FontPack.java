@@ -3,6 +3,7 @@ package mnm.hdfontgen.pack;
 import mnm.hdfontgen.Log;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -12,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class FontPack {
 
@@ -27,27 +29,45 @@ public class FontPack {
         }
     }
 
-    public void writeTo(FileSystem zipFs) throws IOException {
+    public void writeTo(FileSystem zipFs, boolean parallel) throws UncheckedIOException {
         // write all the pages
-        for (Resource page : resources) {
+        var stream = resources.stream();
+        if (parallel) {
+            stream = stream.parallel();
+        }
+        stream.forEach(consume(page -> {
             Path pagePath = zipFs.getPath(page.getPath().getFileLocation());
             Log.log("Writing %s", pagePath.getFileName());
             if (pagePath.getParent() != null) {
                 Files.createDirectories(pagePath.getParent());
             }
             page.writeTo(pagePath);
-        }
+        }));
     }
 
-    public void writeTo(String filename) throws IOException {
+    public void writeTo(String filename, boolean parallel) throws IOException, UncheckedIOException {
         var file = Paths.get(filename);
         var uri = URI.create("jar:" + file.toUri());
         var env = new HashMap<String, String>();
         env.put("create", "true");
 
         try (var fs = FileSystems.newFileSystem(uri, env)) {
-            this.writeTo(fs);
+            this.writeTo(fs, parallel);
         }
     }
 
+    private static <T> Consumer<T> consume(IOConsumer<T> consumer) {
+        return obj -> {
+            try {
+                consumer.accept(obj);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        };
+    }
+
+    private interface IOConsumer<T> {
+        void accept(T obj) throws IOException;
+
+    }
 }

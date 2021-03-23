@@ -8,6 +8,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 /*
  * Mostly generated using Window Builder Pro
@@ -25,6 +26,7 @@ public class GeneratorWindow {
     private JLabel lblStatus;
     private JCheckBox checkboxUnicode;
     private JButton btnCreate;
+    private JCheckBox checkboxParallel;
 
     public GeneratorWindow() {
         initialize();
@@ -49,6 +51,18 @@ public class GeneratorWindow {
         panel.add(comboBox, gbc_comboBox);
 
         return comboBox;
+    }
+
+    private static JCheckBox createCheckbox(JPanel panel, String labelString, int y) {
+
+        var checkbox = new JCheckBox(labelString);
+        var gbc_checkbox = new GridBagConstraints();
+        gbc_checkbox.gridwidth = 2;
+        gbc_checkbox.insets = new Insets(0, 0, 5, 5);
+        gbc_checkbox.gridx = 1;
+        gbc_checkbox.gridy = y;
+        panel.add(checkbox, gbc_checkbox);
+        return checkbox;
     }
 
     private void initialize() {
@@ -109,13 +123,8 @@ public class GeneratorWindow {
         choiceFormat = createComboBox(panel, "Pack Format:", PackFormat.values(), ++y);
         choiceFormat.setSelectedItem(PackFormat.LATEST);
 
-        checkboxUnicode = new JCheckBox("Unicode (Experimental)");
-        var gbc_checkboxUnicode = new GridBagConstraints();
-        gbc_checkboxUnicode.gridwidth = 2;
-        gbc_checkboxUnicode.insets = new Insets(0, 0, 5, 5);
-        gbc_checkboxUnicode.gridx = 1;
-        gbc_checkboxUnicode.gridy = ++y;
-        panel.add(checkboxUnicode, gbc_checkboxUnicode);
+        checkboxUnicode = createCheckbox(panel, "Unicode (Legacy)", ++y);
+        checkboxParallel = createCheckbox(panel, "Parallel Bitmaps", ++y);
 
         btnCreate = new JButton("Create");
         btnCreate.addActionListener(e -> this.startThread());
@@ -166,10 +175,11 @@ public class GeneratorWindow {
         settings.size = getTextureSize();
         settings.format = getPackFormat();
         settings.unicode = checkboxUnicode.isSelected();
+        settings.parallel = checkboxParallel.isSelected();
 
         try {
             FontGenerator.generate(settings);
-        } catch (IOException e) {
+        } catch (UncheckedIOException | IOException e) {
             e.printStackTrace();
             lblStatus.setText("An error has occurred.!");
             // TODO create log file so users can check the log

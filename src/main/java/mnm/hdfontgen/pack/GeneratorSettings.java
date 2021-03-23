@@ -12,6 +12,7 @@ public class GeneratorSettings {
 
     public String description;
     public boolean unicode = false;
+    public boolean parallel = false;
 
     public GeneratorSettings(Font font) {
         this.font = font;

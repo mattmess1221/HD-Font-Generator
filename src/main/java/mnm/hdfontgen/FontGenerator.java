@@ -5,6 +5,7 @@ import mnm.hdfontgen.pack.PackFormat;
 
 import java.awt.*;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 public class FontGenerator implements Runnable {
 
@@ -20,13 +21,13 @@ public class FontGenerator implements Runnable {
         }
     }
 
-    public static void generate(GeneratorSettings settings) throws IOException {
+    public static void generate(GeneratorSettings settings) throws UncheckedIOException, IOException {
         var desc = settings.getDescription();
         var generator = settings.format.getFactory().create();
         var pack = generator.generate(settings);
         var filename = String.format("%s.zip", desc);
         Log.log("Rendering pages");
-        pack.writeTo(filename);
+        pack.writeTo(filename, settings.parallel);
         Log.log("Generated font at %s", filename);
     }
 
@@ -59,6 +60,7 @@ public class FontGenerator implements Runnable {
             if (args.length >= 3) {
                 // flags, use any string to bypass
                 settings.unicode = args[2].contains("u");
+                settings.parallel = args[2].contains("p");
                 quiet = args[2].contains("q");
             }
             if (args.length == 4) {
@@ -69,9 +71,8 @@ public class FontGenerator implements Runnable {
 
             try {
                 FontGenerator.generate(settings);
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.exit(3);
+            } catch (IOException | UncheckedIOException e) {
+                throw new RuntimeException(e);
             }
         } else {
             // wrong usage
@@ -91,6 +92,7 @@ public class FontGenerator implements Runnable {
                 "Command Line Usage: <font name> <texture size> [flags]",
                 "Flags:",
                 "    u    Export unicode",
+                "    p    Enable parallel bitmap generation",
                 "    q    Quiet"
         );
     }
