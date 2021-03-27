@@ -1,4 +1,4 @@
-package mnm.hdfontgen.pack;
+package mnm.hdfontgen.pack.resource;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

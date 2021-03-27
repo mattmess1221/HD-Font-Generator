@@ -1,7 +1,7 @@
 package mnm.hdfontgen.pack.provider;
 
 import mnm.hdfontgen.pack.GeneratorSettings;
-import mnm.hdfontgen.pack.Resource;
+import mnm.hdfontgen.pack.resource.Resource;
 
 public abstract class FontProvider {
     public final String type;

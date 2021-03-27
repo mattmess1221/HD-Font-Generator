@@ -1,6 +1,7 @@
 package mnm.hdfontgen.pack;
 
 import com.google.gson.annotations.SerializedName;
+import mnm.hdfontgen.pack.resource.AbstractJsonResource;
 
 public class PackJson extends AbstractJsonResource {
 

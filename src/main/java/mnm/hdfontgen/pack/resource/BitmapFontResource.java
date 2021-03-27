@@ -1,6 +1,7 @@
-package mnm.hdfontgen.pack;
+package mnm.hdfontgen.pack.resource;
 
 import mnm.hdfontgen.HDFont;
+import mnm.hdfontgen.pack.ResourcePath;
 
 import java.awt.image.BufferedImage;
 

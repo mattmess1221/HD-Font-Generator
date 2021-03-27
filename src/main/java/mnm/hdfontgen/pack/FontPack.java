@@ -1,6 +1,7 @@
 package mnm.hdfontgen.pack;
 
 import mnm.hdfontgen.Log;
+import mnm.hdfontgen.pack.resource.Resource;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;

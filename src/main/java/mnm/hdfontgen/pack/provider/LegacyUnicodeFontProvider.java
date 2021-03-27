@@ -1,9 +1,9 @@
 package mnm.hdfontgen.pack.provider;
 
 import mnm.hdfontgen.HDFont;
-import mnm.hdfontgen.pack.BitmapFontResource;
+import mnm.hdfontgen.pack.resource.BitmapFontResource;
 import mnm.hdfontgen.pack.GeneratorSettings;
-import mnm.hdfontgen.pack.Resource;
+import mnm.hdfontgen.pack.resource.Resource;
 import mnm.hdfontgen.pack.ResourcePath;
 
 class LegacyUnicodeFontProvider extends FontProvider {

@@ -1,6 +1,6 @@
 package mnm.hdfontgen.pack.provider;
 
-import mnm.hdfontgen.pack.AbstractJsonResource;
+import mnm.hdfontgen.pack.resource.AbstractJsonResource;
 import mnm.hdfontgen.pack.ResourcePath;
 import mnm.hdfontgen.pack.ZipPath;
 

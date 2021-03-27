@@ -1,4 +1,4 @@
-package mnm.hdfontgen.pack;
+package mnm.hdfontgen.pack.resource;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
