@@ -10,7 +10,7 @@ public enum PackFormat {
     V4(4, "1.13", "1.14.4", BitmapFontGenerator::new),
     V5(5, "1.15", "1.16.1", BitmapFontGenerator::new),
     V6(6, "1.16.2", "1.16.5", BitmapFontGenerator::new),
-    V7(7, "1.17", "?", BitmapFontGenerator::new),
+    V7(7, "1.17", null, BitmapFontGenerator::new),
     ;
 
     public static final PackFormat LATEST = V7;
@@ -32,6 +32,9 @@ public enum PackFormat {
     }
 
     public String getVersionRange() {
+        if (maxVersion == null) {
+            return String.format("%s+", minVersion);
+        }
         return String.format("%s-%s", minVersion, maxVersion);
     }
 
@@ -41,6 +44,9 @@ public enum PackFormat {
 
     @Override
     public String toString() {
+        if (maxVersion == null) {
+            return String.format("MC %s+", minVersion);
+        }
         return String.format("MC %s - %s", minVersion, maxVersion);
     }
 }
