@@ -2,6 +2,7 @@ package mnm.hdfontgen.pack;
 
 import mnm.hdfontgen.HDFont;
 import mnm.hdfontgen.TextureSize;
+import mnm.hdfontgen.pack.format.PackFormat;
 
 import java.awt.*;
 

@@ -1,4 +1,4 @@
-package mnm.hdfontgen.bitmap;
+package mnm.hdfontgen.pack.format;
 
 import mnm.hdfontgen.pack.FontPack;
 import mnm.hdfontgen.pack.provider.FontProvidersJson;
@@ -6,7 +6,7 @@ import mnm.hdfontgen.pack.GeneratorSettings;
 import mnm.hdfontgen.pack.PackGenerator;
 import mnm.hdfontgen.pack.provider.StandardFontProviders;
 
-public class BitmapFontGenerator implements PackGenerator {
+class BitmapFontGenerator implements PackGenerator {
     @Override
     public FontPack generate(GeneratorSettings settings) {
         var pack = new FontPack();

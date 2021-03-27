@@ -1,7 +1,6 @@
-package mnm.hdfontgen.pack;
+package mnm.hdfontgen.pack.format;
 
-import mnm.hdfontgen.bitmap.BitmapFontGenerator;
-import mnm.hdfontgen.legacy.LegacyFontGenerator;
+import mnm.hdfontgen.pack.PackGeneratorFactory;
 
 public enum PackFormat {
     V1(1, "1.6.1", "1.8.9", LegacyFontGenerator::new),

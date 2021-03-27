@@ -1,7 +1,7 @@
 package mnm.hdfontgen;
 
 import mnm.hdfontgen.pack.GeneratorSettings;
-import mnm.hdfontgen.pack.PackFormat;
+import mnm.hdfontgen.pack.format.PackFormat;
 
 import java.awt.*;
 import java.io.IOException;
