@@ -1,4 +1,4 @@
-package mnm.hdfontgen;
+package mnm.hdfontgen.pack;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;

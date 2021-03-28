@@ -1,8 +1,5 @@
 package mnm.hdfontgen.pack;
 
-import mnm.hdfontgen.HDFont;
-import mnm.hdfontgen.TextureSize;
-
 import java.awt.*;
 
 public class GeneratorSettings {

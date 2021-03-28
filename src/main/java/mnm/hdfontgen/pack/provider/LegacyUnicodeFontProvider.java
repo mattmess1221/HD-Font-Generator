@@ -1,6 +1,6 @@
 package mnm.hdfontgen.pack.provider;
 
-import mnm.hdfontgen.HDFont;
+import mnm.hdfontgen.pack.HDFont;
 import mnm.hdfontgen.pack.resource.BitmapFontResource;
 import mnm.hdfontgen.pack.GeneratorSettings;
 import mnm.hdfontgen.pack.resource.Resource;

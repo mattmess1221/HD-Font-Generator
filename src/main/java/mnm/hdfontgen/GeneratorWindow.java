@@ -2,6 +2,7 @@ package mnm.hdfontgen;
 
 import mnm.hdfontgen.pack.GeneratorSettings;
 import mnm.hdfontgen.pack.PackFormat;
+import mnm.hdfontgen.pack.TextureSize;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
