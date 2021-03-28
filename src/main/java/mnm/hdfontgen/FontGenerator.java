@@ -1,7 +1,9 @@
 package mnm.hdfontgen;
 
 import mnm.hdfontgen.pack.GeneratorSettings;
-import mnm.hdfontgen.pack.format.PackFormat;
+import mnm.hdfontgen.pack.PackFormat;
+import mnm.hdfontgen.pack.format.BitmapFontGenerator;
+import mnm.hdfontgen.pack.format.LegacyFontGenerator;
 
 import java.awt.*;
 import java.io.IOException;
@@ -23,7 +25,7 @@ public class FontGenerator implements Runnable {
 
     public static void generate(GeneratorSettings settings) throws UncheckedIOException, IOException {
         var desc = settings.getDescription();
-        var generator = settings.format.getFactory().create();
+        var generator = settings.format.supportsFontProviders() ? new BitmapFontGenerator() : new LegacyFontGenerator();
         var pack = generator.generate(settings);
         var filename = String.format("%s.zip", desc);
         Log.log("Rendering pages");

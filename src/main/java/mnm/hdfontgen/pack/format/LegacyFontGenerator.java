@@ -5,7 +5,7 @@ import mnm.hdfontgen.pack.GeneratorSettings;
 import mnm.hdfontgen.pack.PackGenerator;
 import mnm.hdfontgen.pack.provider.StandardFontProviders;
 
-class LegacyFontGenerator implements PackGenerator {
+public class LegacyFontGenerator implements PackGenerator {
 
     @Override
     public FontPack generate(GeneratorSettings settings) {
