@@ -1,6 +1,6 @@
 package mnm.hdfontgen;
 
-import mnm.hdfontgen.pack.GeneratorSettings;
+import mnm.hdfontgen.pack.PackSettings;
 import mnm.hdfontgen.pack.PackFormat;
 import mnm.hdfontgen.pack.TextureSize;
 
@@ -172,14 +172,17 @@ public class GeneratorWindow {
         lblStatus.setText("Working...");
         btnCreate.setEnabled(false);
 
-        var settings = new GeneratorSettings(getChoiceFont());
-        settings.size = getTextureSize();
-        settings.format = getPackFormat();
-        settings.unicode = checkboxUnicode.isSelected();
-        settings.parallel = checkboxParallel.isSelected();
+        var settings = new PackSettings.Builder(getPackFormat())
+                .bitmap()
+                .withFont(getChoiceFont())
+                .withSize(getTextureSize())
+                .withUnicode(checkboxUnicode.isSelected())
+                .build();
+
+        var parallel = checkboxParallel.isSelected();
 
         try {
-            FontGenerator.generate(settings);
+            FontGenerator.generate(settings, parallel);
         } catch (UncheckedIOException | IOException e) {
             e.printStackTrace();
             lblStatus.setText("An error has occurred.!");

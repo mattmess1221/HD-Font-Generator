@@ -1,25 +1,26 @@
 package mnm.hdfontgen.pack.provider;
 
+import mnm.hdfontgen.pack.PackSettings;
 import mnm.hdfontgen.pack.ResourcePath;
 
 public final class StandardFontProviders {
 
-    public static FontProvider ascii() {
+    public static FontProvider<PackSettings.Bitmap> ascii() {
         ResourcePath file = new ResourcePath("font/ascii.png");
         return new BitmapFontProvider(file, 7, ASCII);
     }
 
-    public static FontProvider accented() {
+    public static FontProvider<PackSettings.Bitmap> accented() {
         ResourcePath file = new ResourcePath("font/accented.png");
         return new BitmapFontProvider(file, 12, 10, ACCENTED);
     }
 
-    public static FontProvider nonLatinEuropean() {
+    public static FontProvider<PackSettings.Bitmap> nonLatinEuropean() {
         ResourcePath file = new ResourcePath("font/nonlatin_european.png");
         return new BitmapFontProvider(file, 7, NONLATIN_EUROPEAN);
     }
 
-    public static FontProvider unicodePages() {
+    public static FontProvider<PackSettings.Bitmap> unicodePages() {
         ResourcePath sizes = new ResourcePath("font/glyph_sizes.bin");
         ResourcePath template = new ResourcePath("font/unicode_page_%s.png");
         return new LegacyUnicodeFontProvider(sizes, template);

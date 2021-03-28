@@ -1,5 +1,6 @@
 package mnm.hdfontgen.pack.provider;
 
+import mnm.hdfontgen.pack.PackSettings;
 import mnm.hdfontgen.pack.resource.AbstractJsonResource;
 import mnm.hdfontgen.pack.ResourcePath;
 import mnm.hdfontgen.pack.ZipPath;
@@ -8,10 +9,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class FontProvidersJson extends AbstractJsonResource {
+public class FontProvidersJson<T extends PackSettings> extends AbstractJsonResource {
 
     private transient final ResourcePath path;
-    private final List<FontProvider> providers;
+    private final List<FontProvider<T>> providers;
 
     public FontProvidersJson(String namespace, String name) {
         this.path = new ResourcePath(namespace, String.format("font/%s.json", name));
@@ -23,11 +24,11 @@ public class FontProvidersJson extends AbstractJsonResource {
         return path;
     }
 
-    public void addProvider(FontProvider provider) {
+    public void addProvider(FontProvider<T> provider) {
         this.providers.add(provider);
     }
 
-    public List<FontProvider> getProviders() {
+    public List<? extends FontProvider<T>> getProviders() {
         return Collections.unmodifiableList(providers);
     }
 

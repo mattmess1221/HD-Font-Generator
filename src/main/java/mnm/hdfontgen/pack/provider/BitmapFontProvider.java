@@ -1,11 +1,11 @@
 package mnm.hdfontgen.pack.provider;
 
 import mnm.hdfontgen.pack.resource.BitmapFontResource;
-import mnm.hdfontgen.pack.GeneratorSettings;
+import mnm.hdfontgen.pack.PackSettings;
 import mnm.hdfontgen.pack.resource.Resource;
 import mnm.hdfontgen.pack.ResourcePath;
 
-class BitmapFontProvider extends FontProvider {
+class BitmapFontProvider extends FontProvider<PackSettings.Bitmap> {
 
     private final ResourcePath file;
     private final Integer height;
@@ -25,7 +25,7 @@ class BitmapFontProvider extends FontProvider {
     }
 
     @Override
-    public Resource[] getResources(GeneratorSettings settings) {
+    public Resource[] getResources(PackSettings.Bitmap settings) {
         var font = settings.getFont();
 
         String texturePath = String.format("textures/%s", file.getPath());
