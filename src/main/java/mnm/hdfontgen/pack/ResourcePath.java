@@ -39,7 +39,7 @@ public final class ResourcePath implements ZipPath {
         return String.format("%s:%s", namespace, path);
     }
 
-    public static class Serializer implements JsonSerializer<ResourcePath> {
+    static class Serializer implements JsonSerializer<ResourcePath> {
 
         @Override
         public JsonElement serialize(ResourcePath src, Type typeOfSrc, JsonSerializationContext context) {
