@@ -48,6 +48,9 @@ public class FontPack {
 
     public void writeTo(String filename, boolean parallel) throws IOException, UncheckedIOException {
         var file = Paths.get(filename);
+        if (Files.exists(file)) {
+            Files.delete(file);
+        }
         var uri = URI.create("jar:" + file.toUri());
         var env = new HashMap<String, String>();
         env.put("create", "true");

@@ -8,6 +8,7 @@ import mnm.hdfontgen.pack.TextureSize;
 import java.awt.*;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class FontGenerator implements Runnable {
         }
     }
 
-    public static void generate(PackSettings.Bitmap settings, boolean parallel) throws UncheckedIOException, IOException {
+    public static void generate(PackSettings settings, boolean parallel) throws UncheckedIOException, IOException {
         PackGenerator generator = settings.createGenerator();
         var pack = generator.generate();
         var filename = String.format("%s.zip", settings.description);
@@ -66,21 +67,47 @@ public class FontGenerator implements Runnable {
             if (options.containsKey("quiet")) {
                 quiet = true;
             }
-            var format = parsePackFormat(options.getOrDefault("format", PackFormat.LATEST.name()));
-            var builder = new PackSettings.Builder(format);
-            if (options.containsKey("description")) {
-                builder.description(options.get("description"));
-            }
-            var bitmap = builder.bitmap();
-            bitmap.withFont(Font.decode(options.getOrDefault("font", "Dialog.plain")));
-            bitmap.withSize(parseTextureSize(options.getOrDefault("size", TextureSize.x32.name())));
-            bitmap.withUnicode(options.containsKey("unicode"));
 
-            var settings = bitmap.build();
+            var settings = parseSettings(options);
+
             FontGenerator.generate(settings, options.containsKey("parallel"));
         } catch (IOException | UncheckedIOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static PackSettings parseSettings(Map<String, String> options) throws SystemExit {
+        var format = parsePackFormat(requireOption(options, "format"));
+        var builder = new PackSettings.Builder(format);
+        if (options.containsKey("description")) {
+            builder.withDescription(options.get("description"));
+        }
+        var type = requireOption(options, "type");
+        switch (type) {
+            case "bitmap": {
+                return builder.bitmap()
+                        .withFont(Font.decode(requireOption(options, "font")))
+                        .withSize(parseTextureSize(options.getOrDefault("size", TextureSize.x32.name())))
+                        .withUnicode(options.containsKey("unicode"))
+                        .build();
+            }
+            case "truetype": {
+                return builder.trueType()
+                        .withFont(Paths.get(requireOption(options, "font")))
+                        .withOversample(Float.parseFloat(options.getOrDefault("oversample", "1")))
+                        .build();
+            }
+            default:
+                throw printUnsupportedOption("type", type, "bitmap", "truetype");
+        }
+    }
+
+    private static String requireOption(Map<String, String> options, String key) throws SystemExit {
+        var value = options.get(key);
+        if (value == null) {
+            throw printMissingOption(key);
+        }
+        return value;
     }
 
     /**
@@ -131,34 +158,52 @@ public class FontGenerator implements Runnable {
         return Optional.empty();
     }
 
+    private static SystemExit printMissingOption(String option) {
+        return new SystemExit(2,
+                "Option --" + option + " is missing and is required."
+        );
+    }
+
+    private static SystemExit printUnsupportedOption(String option, String value, String... values) {
+        var supported = String.join(", ", values);
+        return new SystemExit(2,
+                value + " is not a supported " + option + ".",
+                "Supported values are: " + supported
+        );
+    }
+
     private static SystemExit printFormats(String format) {
         var supported = Arrays.stream(PackFormat.values())
-                .map(PackFormat::name)
-                .collect(Collectors.joining(", "));
-
-        return new SystemExit(2,
-                format + " is not a supported pack format. Is it a newer version?",
-                "Supported formats are: " + supported
-        );
+                .map(PackFormat::getFormat)
+                .map(Objects::toString)
+                .toArray(String[]::new);
+        return printUnsupportedOption("pack format", format, supported);
     }
 
     private static SystemExit printSizes(String size) {
         var supported = Arrays.stream(TextureSize.values())
                 .map(TextureSize::getTextureSize)
-                .collect(Collectors.toList());
-        return new SystemExit(2,
-                size + " is not a supported texture size.",
-                "Supported values are: " + supported
-        );
+                .map(Objects::toString)
+                .toArray(String[]::new);
+        return printUnsupportedOption("texture size", size, supported);
     }
 
     private static SystemExit printUsage() {
-        return new SystemExit(1,
-                "Command Line Usage: <font name> <texture size> [flags]",
-                "Flags:",
-                "    u    Export unicode",
-                "    p    Enable parallel bitmap generation",
-                "    q    Quiet"
+        return new SystemExit(0,
+                "Command Line Usage",
+                "Options:",
+                "    --type <type>           The type of font to generate (bitmap, truetype)",
+                "    --format <fmt>          The pack format to use",
+                "    --description <desc>    The description to use for the pack",
+                "    --quiet                 Disable log output",
+                "    --help                  Displays this help text and exits",
+                "Bitmap Options:",
+                "    --font <name>           The name of the font registered in the system to use",
+                "    --size <size>           The size of font to use " + Arrays.stream(TextureSize.values()).map(Object::toString).collect(Collectors.joining(", ", "(", ")")),
+                "    --unicode               Generates unicode pages",
+                "TrueType Options:",
+                "    --font <path>           The file path to a ttf or otf file",
+                "    --oversample <num>      A decimal number specifying the resolution multiplier of the font"
         );
     }
 

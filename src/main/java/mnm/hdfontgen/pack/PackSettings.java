@@ -2,8 +2,10 @@ package mnm.hdfontgen.pack;
 
 import mnm.hdfontgen.pack.format.BitmapFontGenerator;
 import mnm.hdfontgen.pack.format.LegacyFontGenerator;
+import mnm.hdfontgen.pack.format.TrueTypeFontGenerator;
 
 import java.awt.*;
+import java.nio.file.Path;
 import java.util.Objects;
 
 public abstract class PackSettings {
@@ -44,6 +46,22 @@ public abstract class PackSettings {
         }
     }
 
+    public static class TrueType extends PackSettings {
+        public final Path font;
+        public final float oversample;
+
+        private TrueType(PackFormat format, String description, Path font, float oversample) {
+            super(format, description);
+            this.font = font;
+            this.oversample = oversample;
+        }
+
+        @Override
+        public PackGenerator createGenerator() {
+            return new TrueTypeFontGenerator(this);
+        }
+    }
+
     public static class Builder {
         private final PackFormat format;
 
@@ -53,34 +71,32 @@ public abstract class PackSettings {
             this.format = Objects.requireNonNull(format);
         }
 
-        public Builder description(String desc) {
+        public Builder withDescription(String desc) {
             this.description = Objects.requireNonNull(desc);
             return this;
         }
 
         public BitmapBuilder bitmap() {
-            return new BitmapBuilder(this);
+            return new BitmapBuilder();
         }
 
-        public static class BitmapBuilder {
+        public TrueTypeBuilder trueType() {
+            return new TrueTypeBuilder();
+        }
 
-            private final Builder parent;
+        public class BitmapBuilder {
 
             private Font font;
             private TextureSize size;
             private boolean unicode;
 
-            public BitmapBuilder(Builder parent) {
-                this.parent = parent;
-            }
-
             private String getDescription() {
-                if (parent.description != null) {
-                    return parent.description;
+                if (description != null) {
+                    return description;
                 }
                 var fontName = font.getFontName();
                 var withUnicode = unicode ? " with unicode" : "";
-                var versions = parent.format.getVersionRange();
+                var versions = format.getVersionRange();
 
                 return String.format("%s %s%s for Minecraft %s", fontName, size, withUnicode, versions);
             }
@@ -102,9 +118,41 @@ public abstract class PackSettings {
 
             public Bitmap build() {
                 checkNotNull(font, "font");
-                checkNotNull(size, "size");;
-                return new Bitmap(parent.format, getDescription(), font, size, unicode);
+                checkNotNull(size, "size");
+                return new Bitmap(format, getDescription(), font, size, unicode);
             }
+        }
+
+        public class TrueTypeBuilder {
+            public Path font;
+            public float oversample = 1f;
+
+            private String getDescription() {
+                if (description != null) {
+                    return description;
+                }
+
+                var fontName = font.getFileName().toString();
+                var versions = format.getVersionRange();
+
+                return String.format("%s x%.01f for Minecraft %s", fontName, oversample, versions);
+            }
+
+            public TrueTypeBuilder withFont(Path fontFile) {
+                this.font = Objects.requireNonNull(fontFile);
+                return this;
+            }
+
+            public TrueTypeBuilder withOversample(float oversample) {
+                this.oversample = oversample;
+                return this;
+            }
+
+            public TrueType build() {
+                checkNotNull(font, "font");
+                return new TrueType(format, getDescription(), font, oversample);
+            }
+
         }
     }
 
