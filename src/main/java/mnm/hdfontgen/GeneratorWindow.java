@@ -109,10 +109,8 @@ public class GeneratorWindow {
         panel.add(lblFont, gbc_lblFont);
 
         choiceFont = new JComboBox<>(getInstalledFonts());
-        choiceFont.addItemListener(e -> {
-            var f = getChoiceFont();
-            lblDisplay.setFont(f.deriveFont(Font.PLAIN, 24));
-        });
+        choiceFont.addItemListener(e -> onSetFont());
+        onSetFont();
         var gbc_choice = new GridBagConstraints();
         gbc_choice.fill = GridBagConstraints.BOTH;
         gbc_choice.gridwidth = 2;
@@ -148,6 +146,11 @@ public class GeneratorWindow {
 
     private String[] getInstalledFonts() {
         return GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+    }
+
+    private void onSetFont() {
+        var f = getChoiceFont();
+        lblDisplay.setFont(f.deriveFont(Font.PLAIN, 24));
     }
 
     private Font getChoiceFont() {
