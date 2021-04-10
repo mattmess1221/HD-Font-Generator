@@ -2,19 +2,23 @@ package mnm.hdfontgen.pack.format;
 
 import mnm.hdfontgen.pack.FontPack;
 import mnm.hdfontgen.pack.PackSettings;
-import mnm.hdfontgen.pack.provider.StandardFontProviders;
+import mnm.hdfontgen.pack.provider.FontProvidersJson;
 
-public class LegacyFontGenerator extends AbstractPackGenerator<PackSettings.Bitmap> {
+public class LegacyFontGenerator extends AbstractPackGenerator {
 
-    public LegacyFontGenerator(PackSettings.Bitmap settings) {
+    public LegacyFontGenerator(PackSettings settings) {
         super(settings);
     }
 
     @Override
     protected void populatePack(FontPack pack) {
-        pack.addResources(StandardFontProviders.ascii().getResources(settings));
-        if (settings.unicode) {
-            pack.addResources(StandardFontProviders.unicodePages().getResources(settings));
+        // minecraft:default should be the only provider available. The actual
+        // name doesn't matter since font providers aren't supported.
+        var fontTexture = settings.fonts.get(FontProvidersJson.DEFAULT_NAME);
+
+        var providers = fontTexture.getProviders(settings.format);
+        for (var provider : providers) {
+            pack.addResources(provider.getResources());
         }
     }
 }

@@ -5,30 +5,29 @@ import mnm.hdfontgen.pack.ResourcePath;
 
 public final class StandardFontProviders {
 
-    public static FontProvider<PackSettings.Bitmap> ascii() {
+    public static FontProvider ascii(PackSettings.Bitmap settings) {
         ResourcePath file = new ResourcePath("font/ascii.png");
-        return new BitmapFontProvider(file, 7, ASCII);
+        return new BitmapFontProvider(settings.getFont(), file, 7, ASCII);
     }
 
-    public static FontProvider<PackSettings.Bitmap> accented() {
+    public static FontProvider accented(PackSettings.Bitmap settings) {
         ResourcePath file = new ResourcePath("font/accented.png");
-        return new BitmapFontProvider(file, 12, 10, ACCENTED);
+        return new BitmapFontProvider(settings.getFont(), file, 12, 10, ACCENTED);
     }
 
-    public static FontProvider<PackSettings.Bitmap> nonLatinEuropean() {
+    public static FontProvider nonLatinEuropean(PackSettings.Bitmap settings) {
         ResourcePath file = new ResourcePath("font/nonlatin_european.png");
-        return new BitmapFontProvider(file, 7, NONLATIN_EUROPEAN);
+        return new BitmapFontProvider(settings.getFont(), file, 7, NONLATIN_EUROPEAN);
     }
 
-    public static FontProvider<PackSettings.Bitmap> unicodePages() {
+    public static FontProvider unicodePages(PackSettings.Bitmap settings) {
         ResourcePath sizes = new ResourcePath("font/glyph_sizes.bin");
         ResourcePath template = new ResourcePath("font/unicode_page_%s.png");
-        return new LegacyUnicodeFontProvider(sizes, template);
+        return new LegacyUnicodeFontProvider(settings.getFont(), sizes, template);
     }
 
-    public static FontProvider<PackSettings.TrueType> trueType(String name, float oversample) {
-        ResourcePath file = new ResourcePath(name);
-        return new TrueTypeFontProvider(file, new float[]{0, -0.5f}, 14, oversample, "");
+    public static FontProvider trueType(PackSettings.TrueType settings) {
+        return new TrueTypeFontProvider(settings.font, settings.name, new float[]{0, -0.5f}, 14, settings.oversample, "");
     }
 
     private static final String[] ASCII = {

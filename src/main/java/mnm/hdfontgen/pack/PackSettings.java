@@ -1,36 +1,60 @@
 package mnm.hdfontgen.pack;
 
-import mnm.hdfontgen.pack.format.BitmapFontGenerator;
+import mnm.hdfontgen.pack.format.FontProviderFontGenerator;
 import mnm.hdfontgen.pack.format.LegacyFontGenerator;
-import mnm.hdfontgen.pack.format.TrueTypeFontGenerator;
+import mnm.hdfontgen.pack.provider.FontProvider;
+import mnm.hdfontgen.pack.provider.FontProvidersJson;
+import mnm.hdfontgen.pack.provider.StandardFontProviders;
 
 import java.awt.*;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
-public abstract class PackSettings {
+public class PackSettings {
     public final PackFormat format;
     public final String description;
+    public final Map<ResourcePath, FontTexture> fonts;
 
-    private PackSettings(PackFormat format, String description) {
+    private PackSettings(PackFormat format, String description, Map<ResourcePath, FontTexture> fonts) {
         this.format = format;
         this.description = description;
+        this.fonts = Map.copyOf(fonts);
     }
 
     public PackJson getPackJson() {
         return new PackJson(format.getFormat(), description);
     }
 
-    public abstract PackGenerator createGenerator();
+    public PackGenerator createGenerator() {
+        if (!format.supportsFontProviders()) {
+            return new LegacyFontGenerator(this);
+        }
+        return new FontProviderFontGenerator(this);
+    }
 
-    public static class Bitmap extends PackSettings {
+    public abstract static class FontTexture {
+        public final ResourcePath name;
 
+        protected FontTexture(ResourcePath name) {
+            this.name = name;
+        }
+
+        public abstract List<FontProvider> getProviders(PackFormat format);
+    }
+
+    public static class Bitmap extends FontTexture {
         public final Font font;
         public final TextureSize size;
         public final boolean unicode;
 
-        private Bitmap(PackFormat format, String description, Font font, TextureSize size, boolean unicode) {
-            super(format, description);
+        private Bitmap(ResourcePath name, Font font, TextureSize size, boolean unicode) {
+            super(name);
             this.font = font;
             this.size = size;
             this.unicode = unicode;
@@ -41,31 +65,42 @@ public abstract class PackSettings {
         }
 
         @Override
-        public PackGenerator createGenerator() {
-            return format.supportsFontProviders() ? new BitmapFontGenerator(this) : new LegacyFontGenerator(this);
+        public List<FontProvider> getProviders(PackFormat format) {
+            List<FontProvider> providers = new ArrayList<>(4);
+            providers.add(StandardFontProviders.ascii(this));
+            if (format.supportsFontProviders()) {
+                providers.add(StandardFontProviders.nonLatinEuropean(this));
+                providers.add(StandardFontProviders.accented(this));
+            }
+            if (this.unicode) {
+                providers.add(StandardFontProviders.unicodePages(this));
+            }
+            return providers;
         }
     }
 
-    public static class TrueType extends PackSettings {
+    public static class TrueType extends FontTexture {
         public final Path font;
         public final float oversample;
 
-        private TrueType(PackFormat format, String description, Path font, float oversample) {
-            super(format, description);
+        private TrueType(ResourcePath name, Path font, float oversample) {
+            super(name);
             this.font = font;
             this.oversample = oversample;
         }
 
         @Override
-        public PackGenerator createGenerator() {
-            return new TrueTypeFontGenerator(this);
+        public List<FontProvider> getProviders(PackFormat format) {
+            return List.of(
+                    StandardFontProviders.trueType(this)
+            );
         }
     }
 
-    public static class Builder {
+    public static class Builder implements BuilderBase<PackSettings> {
         private final PackFormat format;
-
         private String description;
+        private Map<ResourcePath, FontTexture> fonts = new HashMap<>();
 
         public Builder(PackFormat format) {
             this.format = Objects.requireNonNull(format);
@@ -76,24 +111,52 @@ public abstract class PackSettings {
             return this;
         }
 
-        public BitmapBuilder bitmap() {
-            return new BitmapBuilder();
+        public Builder bitmap(ResourcePath name, UnaryOperator<BitmapBuilder> func) {
+            return addFontProvider(name, new BitmapBuilder(name), func);
         }
 
-        public TrueTypeBuilder trueType() {
-            return new TrueTypeBuilder();
+        public Builder trueType(ResourcePath name, UnaryOperator<TrueTypeBuilder> func) {
+            if (!this.format.supportsTrueTypeFonts()) {
+                throw new UnsupportedOperationException("Pack format " + this.format + " does not support true type fonts.");
+            }
+            return addFontProvider(name, new TrueTypeBuilder(name), func);
         }
 
-        public class BitmapBuilder {
+        protected <T extends FontTexture, B extends BuilderBase<T>>
+        Builder addFontProvider(ResourcePath name, B builder, UnaryOperator<B> func) {
+            // make sure this name hasn't been registered already
+            if (this.fonts.containsKey(name)) {
+                throw new UnsupportedOperationException("Provider named " + name + " was already created.");
+            }
+            // named fonts are only supported in V6 and up
+            if (!this.format.supportsNamedFonts() && !FontProvidersJson.DEFAULT_NAME.equals(name)) {
+                throw new UnsupportedOperationException("Pack format " + this.format + " does not support named fonts. Only " + FontProvidersJson.DEFAULT_NAME + " is supported.");
+            }
 
+            this.fonts.put(name, func.apply(builder).build());
+            return this;
+        }
+
+        @Override
+        public PackSettings build() {
+            checkNotNull(this.description, "description");
+            check(this.fonts, Predicate.not(Map::isEmpty), "fonts is empty");
+            return new PackSettings(format, description, fonts);
+        }
+
+
+        public class BitmapBuilder implements BuilderBase<Bitmap> {
+
+            private final ResourcePath name;
             private Font font;
             private TextureSize size;
             private boolean unicode;
 
-            private String getDescription() {
-                if (description != null) {
-                    return description;
-                }
+            BitmapBuilder(ResourcePath name) {
+                this.name = name;
+            }
+
+            private String makeDescription() {
                 var fontName = font.getFontName();
                 var withUnicode = unicode ? " with unicode" : "";
                 var versions = format.getVersionRange();
@@ -116,22 +179,27 @@ public abstract class PackSettings {
                 return this;
             }
 
+            @Override
             public Bitmap build() {
                 checkNotNull(font, "font");
                 checkNotNull(size, "size");
-                return new Bitmap(format, getDescription(), font, size, unicode);
+                if (description == null) {
+                    description = makeDescription();
+                }
+                return new Bitmap(name, font, size, unicode);
             }
         }
 
-        public class TrueTypeBuilder {
-            public Path font;
-            public float oversample = 1f;
+        public class TrueTypeBuilder implements BuilderBase<TrueType> {
+            private ResourcePath name;
+            private Path font;
+            private float oversample = 1f;
 
-            private String getDescription() {
-                if (description != null) {
-                    return description;
-                }
+            TrueTypeBuilder(ResourcePath name) {
+                this.name = name;
+            }
 
+            private String makeDescription() {
                 var fontName = font.getFileName().toString();
                 var versions = format.getVersionRange();
 
@@ -148,17 +216,29 @@ public abstract class PackSettings {
                 return this;
             }
 
+            @Override
             public TrueType build() {
                 checkNotNull(font, "font");
-                return new TrueType(format, getDescription(), font, oversample);
+                if (description == null) {
+                    description = makeDescription();
+                }
+                return new TrueType(name, font, oversample);
             }
-
         }
     }
 
     private static void checkNotNull(Object obj, String message) {
-        if (obj == null) {
+        check(obj, Objects::nonNull, message);
+    }
+
+    private static <T> T check(T obj, Predicate<T> condition, String message) {
+        if (!condition.test(obj)) {
             throw new IllegalStateException(message);
         }
+        return obj;
+    }
+
+    private interface BuilderBase<T> {
+        T build();
     }
 }

@@ -3,6 +3,7 @@ package mnm.hdfontgen;
 import mnm.hdfontgen.pack.PackSettings;
 import mnm.hdfontgen.pack.PackFormat;
 import mnm.hdfontgen.pack.TextureSize;
+import mnm.hdfontgen.pack.provider.FontProvidersJson;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -173,11 +174,11 @@ public class GeneratorWindow {
         btnCreate.setEnabled(false);
 
         var settings = new PackSettings.Builder(getPackFormat())
-                .bitmap()
-                .withFont(getChoiceFont())
-                .withSize(getTextureSize())
-                .withUnicode(checkboxUnicode.isSelected())
-                .build();
+                .bitmap(FontProvidersJson.DEFAULT_NAME, b -> b
+                        .withFont(getChoiceFont())
+                        .withSize(getTextureSize())
+                        .withUnicode(checkboxUnicode.isSelected())
+                ).build();
 
         var parallel = checkboxParallel.isSelected();
 

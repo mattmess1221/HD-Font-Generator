@@ -4,6 +4,7 @@ import mnm.hdfontgen.pack.PackFormat;
 import mnm.hdfontgen.pack.PackGenerator;
 import mnm.hdfontgen.pack.PackSettings;
 import mnm.hdfontgen.pack.TextureSize;
+import mnm.hdfontgen.pack.provider.FontProvidersJson;
 
 import java.awt.*;
 import java.io.IOException;
@@ -85,21 +86,24 @@ public class FontGenerator implements Runnable {
         var type = requireOption(options, "type");
         switch (type) {
             case "bitmap": {
-                return builder.bitmap()
+                builder.bitmap(FontProvidersJson.DEFAULT_NAME, b -> b
                         .withFont(Font.decode(requireOption(options, "font")))
                         .withSize(parseTextureSize(options.getOrDefault("size", TextureSize.x32.name())))
                         .withUnicode(options.containsKey("unicode"))
-                        .build();
+                );
+                break;
             }
             case "truetype": {
-                return builder.trueType()
+                builder.trueType(FontProvidersJson.DEFAULT_NAME, b -> b
                         .withFont(Paths.get(requireOption(options, "font")))
                         .withOversample(Float.parseFloat(options.getOrDefault("oversample", "1")))
-                        .build();
+                );
+                break;
             }
             default:
                 throw printUnsupportedOption("type", type, "bitmap", "truetype");
         }
+        return builder.build();
     }
 
     private static String requireOption(Map<String, String> options, String key) throws SystemExit {
@@ -207,7 +211,7 @@ public class FontGenerator implements Runnable {
         );
     }
 
-    private static class SystemExit extends Exception {
+    private static class SystemExit extends RuntimeException {
         private final int code;
 
         SystemExit(int code, String message) {

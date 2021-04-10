@@ -2,17 +2,18 @@ package mnm.hdfontgen.pack.provider;
 
 import mnm.hdfontgen.pack.HDFont;
 import mnm.hdfontgen.pack.resource.BitmapFontResource;
-import mnm.hdfontgen.pack.PackSettings;
 import mnm.hdfontgen.pack.resource.Resource;
 import mnm.hdfontgen.pack.ResourcePath;
 
-class LegacyUnicodeFontProvider extends FontProvider<PackSettings.Bitmap> {
+class LegacyUnicodeFontProvider extends FontProvider {
 
+    private transient final HDFont font;
     final ResourcePath sizes;
     final ResourcePath template;
 
-    LegacyUnicodeFontProvider(ResourcePath sizes, ResourcePath template) {
+    LegacyUnicodeFontProvider(HDFont font, ResourcePath sizes, ResourcePath template) {
         super("legacy_unicode");
+        this.font = font;
         this.sizes = sizes;
         this.template = template;
     }
@@ -44,8 +45,8 @@ class LegacyUnicodeFontProvider extends FontProvider<PackSettings.Bitmap> {
     }
 
     @Override
-    public Resource[] getResources(PackSettings.Bitmap settings) {
+    public Resource[] getResources() {
         // TODO save sizes bin file
-        return this.createUnicodePages(settings.getFont());
+        return this.createUnicodePages(font);
     }
 }

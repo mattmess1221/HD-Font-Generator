@@ -4,11 +4,11 @@ import mnm.hdfontgen.pack.FontPack;
 import mnm.hdfontgen.pack.PackSettings;
 import mnm.hdfontgen.pack.PackGenerator;
 
-abstract class AbstractPackGenerator<T extends PackSettings> implements PackGenerator {
+abstract class AbstractPackGenerator implements PackGenerator {
 
-    protected final T settings;
+    protected final PackSettings settings;
 
-    protected AbstractPackGenerator(T settings) {
+    protected AbstractPackGenerator(PackSettings settings) {
         this.settings = settings;
     }
 
