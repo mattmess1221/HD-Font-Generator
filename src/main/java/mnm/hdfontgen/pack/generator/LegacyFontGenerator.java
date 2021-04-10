@@ -1,4 +1,4 @@
-package mnm.hdfontgen.pack.format;
+package mnm.hdfontgen.pack.generator;
 
 import mnm.hdfontgen.pack.FontPack;
 import mnm.hdfontgen.pack.PackSettings;

@@ -1,7 +1,7 @@
 package mnm.hdfontgen.pack;
 
-import mnm.hdfontgen.pack.format.FontProviderFontGenerator;
-import mnm.hdfontgen.pack.format.LegacyFontGenerator;
+import mnm.hdfontgen.pack.generator.FontProviderFontGenerator;
+import mnm.hdfontgen.pack.generator.LegacyFontGenerator;
 import mnm.hdfontgen.pack.provider.FontProvider;
 import mnm.hdfontgen.pack.provider.FontProvidersJson;
 import mnm.hdfontgen.pack.provider.StandardFontProviders;
