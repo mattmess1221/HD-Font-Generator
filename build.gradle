@@ -1,11 +1,11 @@
 plugins {
     id 'application'
-    id "org.ajoberstar.reckon" version "0.13.0"
+    id "org.ajoberstar.reckon" version "0.16.1"
 }
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
@@ -15,8 +15,10 @@ application {
 }
 
 reckon {
-    scopeFromProp()
-    stageFromProp('milestone', 'rc', 'final')
+    stages('milestone', 'rc', 'final')
+
+    scopeCalc = calcScopeFromProp() | calcScopeFromCommitMessages()
+    stageCalc = calcStageFromProp()
 }
 
 repositories {
@@ -24,5 +26,5 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.google.code.gson:gson:2.9.0'
 }
