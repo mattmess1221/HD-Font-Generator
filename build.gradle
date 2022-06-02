@@ -1,6 +1,7 @@
 plugins {
     id 'application'
     id "org.ajoberstar.reckon" version "0.16.1"
+    id 'org.beryx.jlink' version '2.25.0'
 }
 
 java {
@@ -11,6 +12,7 @@ java {
 
 application {
     // Define the main class for the application.
+    mainModule = 'hdfontgen'
     mainClass = 'mnm.hdfontgen.FontGenerator'
 }
 
@@ -21,6 +23,17 @@ reckon {
     stageCalc = calcStageFromProp()
 }
 
+jlink {
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    launcher {
+        name = 'hdfontgen'
+        noConsole = true
+    }
+
+    jpackage {
+        skipInstaller = true
+    }
+}
 repositories {
     mavenCentral()
 }
