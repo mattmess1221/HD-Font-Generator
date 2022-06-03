@@ -16,6 +16,11 @@ application {
     mainClass = 'mnm.hdfontgen.FontGenerator'
 }
 
+// append the java version to the dist archives
+[distTar, distZip]*.configure{
+    archiveClassifier = "java-${java.toolchain.languageVersion.get()}"
+}
+
 reckon {
     stages('milestone', 'rc', 'final')
 
@@ -34,6 +39,21 @@ jlink {
         skipInstaller = true
     }
 }
+
+task jpackageZip(type: Zip, dependsOn: ['jpackage']) {
+    destinationDirectory = new File(buildDir, "distributions")
+    archiveBaseName = "hdfontgen"
+
+    doFirst {
+        // read in the jpackage.xml file to get the platform name
+        def jpkgFile = new File(jlink.jpackageData.get().imageOutputDir, "${jlink.jpackageData.get().imageName}/lib/app/.jpackage.xml")
+        def jpkg = new XmlParser().parse(jpkgFile)
+        archiveClassifier = jpkg.@platform
+    }
+
+    from jlink.jpackageData.get().imageOutputDir
+}
+
 repositories {
     mavenCentral()
 }
