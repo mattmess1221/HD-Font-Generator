@@ -23,12 +23,8 @@ jobs:
       - id: upload-distributions
         name: Upload Distributions
         uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          file: ./build/distributions/*
-          tags: true
-          draft: true
+          files: ./build/distributions/*
 
   build-packages:
     strategy:
@@ -56,9 +52,5 @@ jobs:
       - id: upload-distributions
         name: Upload Distributions
         uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          file: ./build/distributions/*
-          tags: true
-          draft: true
+          files: ./build/distributions/*
