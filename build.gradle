@@ -40,7 +40,7 @@ jlink {
         skipInstaller = true
     }
 }
-def platform = System.properties["os.name"].toLowerCase()
+def platform = System.properties["os.name"].split(" ")[0].toLowerCase()
 [Zip, Tar].each{type ->
     task("jpackage${type.simpleName}", type: type, dependsOn: "jpackage") {
         destinationDirectory = new File(buildDir, "distributions")
