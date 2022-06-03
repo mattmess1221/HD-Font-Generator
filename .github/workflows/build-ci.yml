@@ -1,6 +1,8 @@
 name: Build CI
 
-on: release
+on:
+  - push
+  - pull_request
 
 jobs:
   build-ci:
