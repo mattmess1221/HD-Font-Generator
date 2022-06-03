@@ -3,7 +3,7 @@ name: Build Distributions
 on:
   release:
     types:
-      - created
+      - released
 
 jobs:
   build-distributions:
