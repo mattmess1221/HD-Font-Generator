@@ -23,7 +23,7 @@ application {
 distTar.compression = "GZIP"
 
 reckon {
-    stages('milestone', 'rc', 'final')
+    stages('build', 'final')
 
     scopeCalc = calcScopeFromProp() | calcScopeFromCommitMessages()
     stageCalc = calcStageFromProp()
@@ -37,6 +37,7 @@ jlink {
     }
 
     jpackage {
+        appVersion = reckon.version.get().normal.toString()
         skipInstaller = true
     }
 }
