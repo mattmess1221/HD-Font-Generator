@@ -20,6 +20,7 @@ application {
 [distTar, distZip]*.configure{
     archiveClassifier = "java-${java.toolchain.languageVersion.get()}"
 }
+distTar.compression = "GZIP"
 
 reckon {
     stages('milestone', 'rc', 'final')
@@ -39,19 +40,23 @@ jlink {
         skipInstaller = true
     }
 }
+def platform = System.properties["os.name"].toLowerCase()
+[Zip, Tar].each{type ->
+    task("jpackage${type.simpleName}", type: type, dependsOn: "jpackage") {
+        destinationDirectory = new File(buildDir, "distributions")
+        archiveClassifier = platform
 
-task jpackageZip(type: Zip, dependsOn: ['jpackage']) {
-    destinationDirectory = new File(buildDir, "distributions")
-    archiveBaseName = "hdfontgen"
+        from jlink.jpackageData.get().imageOutputDir
 
-    doFirst {
-        // read in the jpackage.xml file to get the platform name
-        def jpkgFile = new File(jlink.jpackageData.get().imageOutputDir, "${jlink.jpackageData.get().imageName}/lib/app/.jpackage.xml")
-        def jpkg = new XmlParser().parse(jpkgFile)
-        archiveClassifier = jpkg.@platform
+        if (type === Tar) {
+            compression = "GZIP"
+        }
     }
+}
 
-    from jlink.jpackageData.get().imageOutputDir
+
+task jpackageDist {
+    dependsOn platform == "linux" ? jpackageTar : jpackageZip
 }
 
 repositories {

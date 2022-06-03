@@ -51,7 +51,7 @@ jobs:
         name: Run jpackage
         run: |
           gradle -v
-          gradle jpackageZip
+          gradle jpackageDist
       - id: upload-distributions
         name: Upload Distributions
         uses: softprops/action-gh-release@v1
