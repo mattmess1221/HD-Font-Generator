@@ -25,6 +25,7 @@ distTar.compression = "GZIP"
 reckon {
     stages('build', 'final')
 
+    defaultInferredScope = "patch"
     scopeCalc = calcScopeFromProp() | calcScopeFromCommitMessages()
     stageCalc = calcStageFromProp()
 }
