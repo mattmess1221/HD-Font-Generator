@@ -1,0 +1,22 @@
+name: Build CI
+
+on: release
+
+jobs:
+  build-ci:
+    name: Build CI
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout-code
+        name: Checkout code
+        uses: actions/checkout@v2
+      - id: setup-jdk
+        name: Setup JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      - id: check
+        name: Build distribution
+        run: |
+          gradle -v
+          gradle check

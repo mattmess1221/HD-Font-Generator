@@ -1,0 +1,64 @@
+name: Build Distributions
+
+on: release
+
+jobs:
+  build-distributions:
+    name: Build Distributions
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout-code
+        name: Checkout code
+        uses: actions/checkout@v2
+      - id: setup-jdk
+        name: Setup JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      - id: build
+        name: Build distribution
+        run: |
+          gradle -v
+          gradle build
+      - id: upload-distributions
+        name: Upload Distributions
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file: ./build/distributions/*
+          tags: true
+          draft: true
+
+  build-packages:
+    strategy:
+      matrix:
+        os:
+          - windows-latest
+          - ubuntu-latest
+          - macos-latest
+    name: Build System Packages on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - id: checkout-code
+        name: Checkout code
+        uses: actions/checkout@v2
+      - id: setup-jdk
+        name: Setup JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+      - id: jpackage
+        name: Run jpackage
+        run: |
+          gradle -v
+          gradle jpackageZip
+      - id: upload-distributions
+        name: Upload Distributions
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file: ./build/distributions/*
+          tags: true
+          draft: true
