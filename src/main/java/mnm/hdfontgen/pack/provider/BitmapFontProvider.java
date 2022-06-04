@@ -7,11 +7,11 @@ import mnm.hdfontgen.pack.resource.Resource;
 
 class BitmapFontProvider extends FontProvider {
 
-    private transient final HDFont font;
-    private final ResourcePath file;
-    private final Integer height;
-    private final int ascent;
-    private final String[] chars;
+    transient final HDFont font;
+    final ResourcePath file;
+    final Integer height;
+    final int ascent;
+    final String[] chars;
 
     BitmapFontProvider(HDFont font, ResourcePath file, Integer height, int ascent, String[] chars) {
         super("bitmap");

@@ -42,7 +42,7 @@ public enum PackFormat {
      * Gets the version range supported by this PackFormat. If the latest
      * version as of release
      *
-     * @return
+     * @return The string representation of the version range
      */
     public String getVersionRange() {
         if (maxVersion == null) {

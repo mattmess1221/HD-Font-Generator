@@ -100,7 +100,7 @@ public class PackSettings {
     public static class Builder implements BuilderBase<PackSettings> {
         private final PackFormat format;
         private String description;
-        private Map<ResourcePath, FontTexture> fonts = new HashMap<>();
+        private final Map<ResourcePath, FontTexture> fonts = new HashMap<>();
 
         public Builder(PackFormat format) {
             this.format = Objects.requireNonNull(format);
@@ -191,7 +191,7 @@ public class PackSettings {
         }
 
         public class TrueTypeBuilder implements BuilderBase<TrueType> {
-            private ResourcePath name;
+            private final ResourcePath name;
             private Path font;
             private float oversample = 1f;
 
@@ -231,11 +231,10 @@ public class PackSettings {
         check(obj, Objects::nonNull, message);
     }
 
-    private static <T> T check(T obj, Predicate<T> condition, String message) {
+    private static <T> void check(T obj, Predicate<T> condition, String message) {
         if (!condition.test(obj)) {
             throw new IllegalStateException(message);
         }
-        return obj;
     }
 
     private interface BuilderBase<T> {

@@ -8,12 +8,12 @@ import java.nio.file.Path;
 
 class TrueTypeFontProvider extends FontProvider {
 
-    private transient final Path font;
-    private final ResourcePath file;
-    private final float[] shift;
-    private final float size;
-    private final float oversample;
-    private final String skip;
+    transient final Path font;
+    final ResourcePath file;
+    final float[] shift;
+    final float size;
+    final float oversample;
+    final String skip;
 
     TrueTypeFontProvider(Path font, ResourcePath file, float[] shift, float size, float oversample, String skip) {
         super("ttf");

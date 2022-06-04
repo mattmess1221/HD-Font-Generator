@@ -81,29 +81,22 @@ public class FontGenerator implements Runnable {
         var format = parsePackFormat(requireOption(options, "format"));
         var builder = new PackSettings.Builder(format);
         if (options.containsKey("description")) {
-            builder.withDescription(options.get("description"));
+            builder = builder.withDescription(options.get("description"));
         }
         var type = requireOption(options, "type");
-        switch (type) {
-            case "bitmap": {
-                builder.bitmap(FontProvidersJson.DEFAULT_NAME, b -> b
-                        .withFont(Font.decode(requireOption(options, "font")))
-                        .withSize(parseTextureSize(options.getOrDefault("size", TextureSize.x32.name())))
-                        .withUnicode(options.containsKey("unicode"))
-                );
-                break;
-            }
-            case "truetype": {
-                builder.trueType(FontProvidersJson.DEFAULT_NAME, b -> b
-                        .withFont(Paths.get(requireOption(options, "font")))
-                        .withOversample(Float.parseFloat(options.getOrDefault("oversample", "1")))
-                );
-                break;
-            }
-            default:
-                throw printUnsupportedOption("type", type, "bitmap", "truetype");
-        }
-        return builder.build();
+        return (switch (type) {
+            case "bitmap" -> builder.bitmap(FontProvidersJson.DEFAULT_NAME, b -> b
+                    .withFont(Font.decode(requireOption(options, "font")))
+                    .withSize(parseTextureSize(options.getOrDefault("size", TextureSize.x32.name())))
+                    .withUnicode(options.containsKey("unicode"))
+            );
+            case "truetype" -> builder.trueType(FontProvidersJson.DEFAULT_NAME, b -> b
+                    .withFont(Paths.get(requireOption(options, "font")))
+                    .withOversample(Float.parseFloat(options.getOrDefault("oversample", "1")))
+            );
+            default -> throw printUnsupportedOption("type", type, "bitmap", "truetype");
+        }).build();
+//        return builder.build();
     }
 
     private static String requireOption(Map<String, String> options, String key) throws SystemExit {

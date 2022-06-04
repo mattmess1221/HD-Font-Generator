@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Objects;
 
 public class HDFont {
 
@@ -61,7 +62,7 @@ public class HDFont {
 
     private static Font loadDefaultFont() {
         try (var in = HDFont.class.getResourceAsStream("/unifont-7.0.06.ttf")) {
-            return Font.createFont(Font.TRUETYPE_FONT, in);
+            return Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(in));
         } catch (FontFormatException | IOException e) {
             throw new RuntimeException("Unable to read Unifont fallback font", e);
         }
