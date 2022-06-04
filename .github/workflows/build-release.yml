@@ -10,9 +10,6 @@ jobs:
     name: Create Draft Release
     runs-on: ubuntu-latest
     steps:
-      - id: checkout-code
-        name: Checkout code
-        uses: actions/checkout@v2
       - id: draft-release
         name: Draft Release
         uses: softprops/action-gh-release@v1
@@ -27,8 +24,8 @@ jobs:
       - id: checkout-code
         name: Checkout code
         uses: actions/checkout@v2
-      - name: Fetch Tags
-        run: git fetch --unshallow --tags
+        with:
+          fetch-depth: 0
       - id: setup-jdk
         name: Setup JDK
         uses: actions/setup-java@v1

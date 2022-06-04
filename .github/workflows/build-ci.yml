@@ -12,8 +12,6 @@ jobs:
       - id: checkout-code
         name: Checkout code
         uses: actions/checkout@v2
-      - name: Fetch Tags
-        run: git fetch --unshallow --tags
       - id: setup-jdk
         name: Setup JDK
         uses: actions/setup-java@v1
