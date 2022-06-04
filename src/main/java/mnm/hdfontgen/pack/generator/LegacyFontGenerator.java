@@ -18,7 +18,7 @@ public class LegacyFontGenerator extends AbstractPackGenerator {
 
         var providers = fontTexture.getProviders(settings.format);
         for (var provider : providers) {
-            pack.addResources(provider.getResources());
+            provider.setup(pack);
         }
     }
 }

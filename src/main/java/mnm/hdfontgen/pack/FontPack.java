@@ -1,8 +1,5 @@
 package mnm.hdfontgen.pack;
 
-import mnm.hdfontgen.Log;
-import mnm.hdfontgen.pack.resource.Resource;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URI;
@@ -12,9 +9,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import mnm.hdfontgen.IOUtils;
+import mnm.hdfontgen.Log;
+import mnm.hdfontgen.pack.resource.Resource;
 
 public class FontPack {
 
@@ -24,26 +27,32 @@ public class FontPack {
         this.resources.add(resource);
     }
 
-    public void addResources(Resource[] resources) {
-        for (Resource res : resources) {
-            this.addResource(res);
-        }
+    public void addResources(Collection<? extends Resource> resources) {
+        this.resources.addAll(resources);
     }
 
     public void writeTo(FileSystem zipFs, boolean parallel) throws UncheckedIOException {
         // write all the pages
-        var stream = resources.stream();
-        if (parallel) {
-            stream = stream.parallel();
-        }
-        stream.forEach(consume(page -> {
-            Path pagePath = zipFs.getPath(page.getPath().getFileLocation());
-            Log.log("Writing %s", pagePath.getFileName());
-            if (pagePath.getParent() != null) {
-                Files.createDirectories(pagePath.getParent());
-            }
-            page.writeTo(pagePath);
-        }));
+        this.resources.stream()
+                .collect(Collectors.groupingBy(Resource::order))
+                .entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(Map.Entry::getValue)
+                .forEach(resources -> {
+
+                    var stream = resources.stream();
+                    if (parallel) {
+                        stream = stream.parallel();
+                    }
+                    stream.forEach(IOUtils.consume(page -> {
+                        Path pagePath = zipFs.getPath(page.getPath().getFileLocation());
+                        Log.log("Writing %s", pagePath.getFileName());
+                        if (pagePath.getParent() != null) {
+                            Files.createDirectories(pagePath.getParent());
+                        }
+                        page.writeTo(pagePath);
+                    }));
+                });
     }
 
     public void writeTo(String filename, boolean parallel) throws IOException, UncheckedIOException {
@@ -60,18 +69,4 @@ public class FontPack {
         }
     }
 
-    private static <T> Consumer<T> consume(IOConsumer<T> consumer) {
-        return obj -> {
-            try {
-                consumer.accept(obj);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
-        };
-    }
-
-    private interface IOConsumer<T> {
-        void accept(T obj) throws IOException;
-
-    }
 }

@@ -1,6 +1,6 @@
 package mnm.hdfontgen.pack.provider;
 
-import mnm.hdfontgen.pack.resource.Resource;
+import mnm.hdfontgen.pack.FontPack;
 
 public abstract class FontProvider {
     public final String type;
@@ -9,6 +9,6 @@ public abstract class FontProvider {
         this.type = type;
     }
 
-    public abstract Resource[] getResources();
+    public abstract void setup(FontPack pack);
 
 }

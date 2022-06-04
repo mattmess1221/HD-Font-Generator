@@ -1,10 +1,11 @@
 package mnm.hdfontgen.pack.provider;
 
+import java.nio.file.Path;
+
+import mnm.hdfontgen.pack.FontPack;
 import mnm.hdfontgen.pack.ResourcePath;
 import mnm.hdfontgen.pack.resource.FileResource;
 import mnm.hdfontgen.pack.resource.Resource;
-
-import java.nio.file.Path;
 
 class TrueTypeFontProvider extends FontProvider {
 
@@ -31,9 +32,7 @@ class TrueTypeFontProvider extends FontProvider {
     }
 
     @Override
-    public Resource[] getResources() {
-        return new Resource[] {
-                getFileResource(font)
-        };
+    public void setup(FontPack pack) {
+        pack.addResource(getFileResource(font));
     }
 }

@@ -1,12 +1,11 @@
 package mnm.hdfontgen.pack.generator;
 
+import java.util.Map;
+
 import mnm.hdfontgen.pack.FontPack;
 import mnm.hdfontgen.pack.PackSettings;
 import mnm.hdfontgen.pack.ResourcePath;
-import mnm.hdfontgen.pack.provider.FontProvider;
 import mnm.hdfontgen.pack.provider.FontProvidersJson;
-
-import java.util.Map;
 
 abstract class AbstractFontProviderPackGenerator extends AbstractPackGenerator {
     AbstractFontProviderPackGenerator(PackSettings settings) {
@@ -19,11 +18,7 @@ abstract class AbstractFontProviderPackGenerator extends AbstractPackGenerator {
 
             var providers = new FontProvidersJson(e.getKey());
             populateFontProviders(providers, e.getValue());
-
-            pack.addResource(providers);
-            for (FontProvider provider : providers.getProviders()) {
-                pack.addResources(provider.getResources());
-            }
+            providers.setup(pack);
         }
     }
 

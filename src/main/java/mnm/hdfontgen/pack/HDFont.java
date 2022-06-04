@@ -2,7 +2,9 @@ package mnm.hdfontgen.pack;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -18,7 +20,11 @@ public class HDFont {
         this.size = size;
     }
 
-    public BufferedImage render(String[] chars) {
+    public record RenderResult(BufferedImage image, byte[] sizes) {
+    }
+
+    public RenderResult render(String[] chars) {
+        var sizes = new ByteArrayOutputStream();
         int size = this.size.getTextureSize() / 2;
         int yOffset = size - size / 4;
         var image = new BufferedImage(size * chars[0].length(), size * chars.length, BufferedImage.TYPE_INT_ARGB);
@@ -31,13 +37,18 @@ public class HDFont {
                 }
                 int xPos = x * size;
                 int yPos = y * size;
+                var font = this.getFontForChar(charToRender);
                 graphics.setClip(xPos, yPos, size, size);
-                graphics.setFont(this.getFontForChar(charToRender));
+                graphics.setFont(font);
                 graphics.drawChars(new char[]{charToRender}, 0, 1, xPos, yPos + yOffset);
+
+                var wdth = getCharBounds(font, charToRender).getWidth();
+                var data = (int) Math.ceil(wdth / size * 0xf);
+                sizes.write(data);
             }
         }
         graphics.dispose();
-        return image;
+        return new RenderResult(image, sizes.toByteArray());
     }
 
     private Font getFontForChar(char ch) {
@@ -45,19 +56,19 @@ public class HDFont {
         var f = (font.canDisplay(ch) ? font : fallbackFont).deriveFont(Font.PLAIN, size);
         f = f.deriveFont(Font.PLAIN, size);
 
-        String stringToCheck = Character.toString(ch);
-
         // decrease font size for large fonts.
         int s = size;
-        while (getStringHeight(f, stringToCheck) > size) {
-            f = f.deriveFont(Font.PLAIN, s--);
+
+        Rectangle2D bounds;
+        while ((bounds = getCharBounds(f, ch)) != null && (bounds.getHeight() > size || bounds.getWidth() > size)) {
+            f = f.deriveFont(Font.PLAIN, --s);
         }
         return f;
     }
 
-    private static double getStringHeight(Font f, String string) {
+    private static Rectangle2D getCharBounds(Font f, char c) {
         var context = new FontRenderContext(f.getTransform(), false, false);
-        return f.getStringBounds(string, context).getHeight();
+        return f.getStringBounds(new char[]{c}, 0, 1, context);
     }
 
     private static Font loadDefaultFont() {

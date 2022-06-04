@@ -1,9 +1,9 @@
 package mnm.hdfontgen.pack.provider;
 
+import mnm.hdfontgen.pack.FontPack;
 import mnm.hdfontgen.pack.HDFont;
 import mnm.hdfontgen.pack.ResourcePath;
 import mnm.hdfontgen.pack.resource.BitmapFontResource;
-import mnm.hdfontgen.pack.resource.Resource;
 
 class BitmapFontProvider extends FontProvider {
 
@@ -27,12 +27,10 @@ class BitmapFontProvider extends FontProvider {
     }
 
     @Override
-    public Resource[] getResources() {
-        String texturePath = String.format("textures/%s", file.getPath());
-        ResourcePath path = new ResourcePath(file.getNamespace(), texturePath);
+    public void setup(FontPack pack) {
+        String texturePath = String.format("textures/%s", file.path());
+        ResourcePath path = new ResourcePath(file.namespace(), texturePath);
 
-        return new Resource[]{
-                new BitmapFontResource(path, font, chars)
-        };
+        pack.addResource(new BitmapFontResource(path, font, chars));
     }
 }

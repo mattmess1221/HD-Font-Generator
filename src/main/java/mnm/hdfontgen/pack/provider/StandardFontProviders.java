@@ -22,7 +22,7 @@ public final class StandardFontProviders {
 
     public static FontProvider unicodePages(PackSettings.Bitmap settings) {
         ResourcePath sizes = new ResourcePath("font/glyph_sizes.bin");
-        ResourcePath template = new ResourcePath("font/unicode_page_%s.png");
+        ResourcePath template = new ResourcePath("textures/font/unicode_page_%s.png");
         return new LegacyUnicodeFontProvider(settings.getFont(), sizes, template);
     }
 

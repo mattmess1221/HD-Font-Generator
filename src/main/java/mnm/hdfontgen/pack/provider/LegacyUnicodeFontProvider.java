@@ -1,9 +1,14 @@
 package mnm.hdfontgen.pack.provider;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import mnm.hdfontgen.pack.FontPack;
 import mnm.hdfontgen.pack.HDFont;
-import mnm.hdfontgen.pack.resource.BitmapFontResource;
-import mnm.hdfontgen.pack.resource.Resource;
 import mnm.hdfontgen.pack.ResourcePath;
+import mnm.hdfontgen.pack.resource.BitmapFontResource;
+import mnm.hdfontgen.pack.resource.GlyphSizesResource;
 
 class LegacyUnicodeFontProvider extends FontProvider {
 
@@ -18,16 +23,14 @@ class LegacyUnicodeFontProvider extends FontProvider {
         this.template = template;
     }
 
-    private Resource[] createUnicodePages(HDFont font) {
-        var resources = new Resource[0x100];
-        var texturePath = String.format("textures/%s", template.getPath());
-        texturePath = String.format(texturePath, "%02x");
-        for (int pageIndex = 0; pageIndex < resources.length; pageIndex++) {
+    private List<BitmapFontResource> createUnicodePages(HDFont font) {
+        // file template uses hex integers, json template uses strings
+        var texturePath = template.path().replace("%s", "%02x");
+        return IntStream.range(0, 0x100).mapToObj(pageIndex -> {
             String[] charTable = getUnicodeTable(pageIndex);
-            var path = new ResourcePath(String.format(texturePath, pageIndex));
-            resources[pageIndex] = new BitmapFontResource(path, font, charTable);
-        }
-        return resources;
+            var path = new ResourcePath(template.namespace(), texturePath.formatted(pageIndex));
+            return new BitmapFontResource(path, font, charTable);
+        }).collect(Collectors.toList());
     }
 
     private static String[] getUnicodeTable(int tableIndex) {
@@ -45,8 +48,9 @@ class LegacyUnicodeFontProvider extends FontProvider {
     }
 
     @Override
-    public Resource[] getResources() {
-        // TODO save sizes bin file
-        return this.createUnicodePages(font);
+    public void setup(FontPack pack) {
+        var pages = this.createUnicodePages(font);
+        pack.addResources(pages);
+        pack.addResource(new GlyphSizesResource(this.sizes, pages));
     }
 }
