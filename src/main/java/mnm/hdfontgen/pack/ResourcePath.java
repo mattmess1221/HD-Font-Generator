@@ -1,31 +1,26 @@
 package mnm.hdfontgen.pack;
 
+import java.lang.reflect.Type;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.annotations.JsonAdapter;
 
-import java.lang.reflect.Type;
-
 @JsonAdapter(ResourcePath.Serializer.class)
-public final class ResourcePath implements ZipPath {
-    private final String namespace;
-    private final String path;
-
-    public ResourcePath(String namespace, String path) {
-        this.namespace = namespace;
-        this.path = path;
-    }
+public record ResourcePath(String namespace, String path) implements ZipPath {
 
     public ResourcePath(String path) {
         this("minecraft", path);
     }
 
+    @Deprecated
     public String getNamespace() {
         return namespace;
     }
 
+    @Deprecated
     public String getPath() {
         return path;
     }
@@ -35,6 +30,7 @@ public final class ResourcePath implements ZipPath {
         return String.format("assets/%s/%s", namespace, path);
     }
 
+    @Override
     public String toString() {
         return String.format("%s:%s", namespace, path);
     }

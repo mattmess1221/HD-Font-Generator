@@ -26,7 +26,7 @@ class TrueTypeFontProvider extends FontProvider {
     }
 
     private Resource getFileResource(Path input) {
-        ResourcePath output = new ResourcePath(file.getNamespace(), "font/" + file.getPath());
+        ResourcePath output = new ResourcePath(file.namespace(), "font/" + file.path());
         return new FileResource(input, output);
     }
 
