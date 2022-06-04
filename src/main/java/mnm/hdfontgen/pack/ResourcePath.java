@@ -15,16 +15,6 @@ public record ResourcePath(String namespace, String path) implements ZipPath {
         this("minecraft", path);
     }
 
-    @Deprecated
-    public String getNamespace() {
-        return namespace;
-    }
-
-    @Deprecated
-    public String getPath() {
-        return path;
-    }
-
     @Override
     public String getFileLocation() {
         return String.format("assets/%s/%s", namespace, path);
