@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="mnm.hdfontgen.fxml.Controller"
+            prefHeight="400.0" prefWidth="600.0">
+    <style>-fx-font-size: 14px;</style>
+    <Label>Hello, world!</Label>
+    <Button fx:id="btn" onAction="#onClick">Click me</Button>
+</VBox>

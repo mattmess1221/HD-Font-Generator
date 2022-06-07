@@ -1,5 +1,6 @@
 plugins {
     id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.10'
     id "org.ajoberstar.reckon" version "0.16.1"
     id 'org.beryx.jlink' version '2.25.0'
 }
@@ -10,6 +11,11 @@ java {
     }
 }
 
+javafx {
+    version = "17.0.1"
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.swing']
+}
+
 application {
     // Define the main class for the application.
     mainModule = 'hdfontgen'
@@ -17,7 +23,7 @@ application {
 }
 
 // append the java version to the dist archives
-[distTar, distZip]*.configure{
+[distTar, distZip]*.configure {
     archiveClassifier = "java-${java.toolchain.languageVersion.get()}"
 }
 distTar.compression = "GZIP"
@@ -43,7 +49,7 @@ jlink {
     }
 }
 def platform = System.properties["os.name"].split(" ")[0].toLowerCase()
-[Zip, Tar].each{type ->
+[Zip, Tar].each { type ->
     task("jpackage${type.simpleName}", type: type, dependsOn: "jpackage") {
         destinationDirectory = new File(buildDir, "distributions")
         archiveClassifier = platform

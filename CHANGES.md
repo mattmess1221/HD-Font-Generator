@@ -2,7 +2,7 @@
 
 ## Unreleased
 
--
+- JavaFX (TODO, details)
 
 ## 1.3.1
 
