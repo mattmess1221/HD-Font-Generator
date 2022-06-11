@@ -16,6 +16,13 @@ underscores, then the texture. A nonexistent font will use the JRE default
 Note: Every font is different, so some may look weird and require tweaking after
 generation, but most fonts should be fine.
 
+## Download
+
+The generator can be downloaded from the [Release](https://github.com/killjoy1221/HD-Font-Generator/releases/latest)
+page. Pick the file for your operating system.
+
+Extract the zip or tar file to run the executable.
+
 ## Options
 
 Different options can be customized before generation. These include:
