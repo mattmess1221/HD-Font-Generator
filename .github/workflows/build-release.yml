@@ -16,37 +16,11 @@ jobs:
         with:
           draft: true
 
-
-  build-distributions:
-    name: Build Distributions
-    runs-on: ubuntu-latest
-    steps:
-      - id: checkout-code
-        name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - id: setup-jdk
-        name: Setup JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: 17
-      - id: build
-        name: Build distribution
-        run: |
-          gradle -v
-          gradle build
-      - id: upload-distributions
-        name: Upload Distributions
-        uses: softprops/action-gh-release@v1
-        with:
-          files: ./build/distributions/*
-          draft: true
-
   build-packages:
     name: Build System Packages on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os:
           - windows-latest

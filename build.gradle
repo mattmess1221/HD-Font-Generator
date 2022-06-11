@@ -22,11 +22,8 @@ application {
     mainClass = 'mnm.hdfontgen.FontGenerator'
 }
 
-// append the java version to the dist archives
-[distTar, distZip]*.configure {
-    archiveClassifier = "java-${java.toolchain.languageVersion.get()}"
-}
-distTar.compression = "GZIP"
+distZip.enabled = false
+distTar.enabled = false
 
 reckon {
     stages('build', 'final')
@@ -49,10 +46,13 @@ jlink {
     }
 }
 def platform = System.properties["os.name"].split(" ")[0].toLowerCase()
+def arch = System.properties["os.arch"]
+
 [Zip, Tar].each { type ->
     task("jpackage${type.simpleName}", type: type, dependsOn: "jpackage") {
         destinationDirectory = new File(buildDir, "distributions")
-        archiveClassifier = platform
+        archiveClassifier = "$platform-$arch"
+        JavaVersion.VERSION_17.toString()
 
         from jlink.jpackageData.get().imageOutputDir
 
@@ -61,7 +61,6 @@ def platform = System.properties["os.name"].split(" ")[0].toLowerCase()
         }
     }
 }
-
 
 task jpackageDist {
     dependsOn platform == "linux" ? jpackageTar : jpackageZip

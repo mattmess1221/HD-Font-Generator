@@ -1,8 +1,9 @@
 name: Build CI
 
 on:
-  - push
-  - pull_request
+  push:
+    tags-ignore: ["*"]
+  pull_request:
 
 jobs:
   build-ci:
