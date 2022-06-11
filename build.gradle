@@ -13,7 +13,7 @@ java {
 application {
     // Define the main class for the application.
     mainModule = 'hdfontgen'
-    mainClass = 'mnm.hdfontgen.FontGenerator'
+    mainClass = 'mnm.hdfontgen.Main'
 }
 
 // append the java version to the dist archives
