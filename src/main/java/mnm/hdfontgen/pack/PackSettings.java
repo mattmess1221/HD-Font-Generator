@@ -1,11 +1,5 @@
 package mnm.hdfontgen.pack;
 
-import mnm.hdfontgen.pack.generator.FontProviderFontGenerator;
-import mnm.hdfontgen.pack.generator.LegacyFontGenerator;
-import mnm.hdfontgen.pack.provider.FontProvider;
-import mnm.hdfontgen.pack.provider.FontProvidersJson;
-import mnm.hdfontgen.pack.provider.StandardFontProviders;
-
 import java.awt.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -15,6 +9,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+
+import mnm.hdfontgen.pack.generator.FontProviderFontGenerator;
+import mnm.hdfontgen.pack.generator.LegacyFontGenerator;
+import mnm.hdfontgen.pack.provider.FontProvider;
+import mnm.hdfontgen.pack.provider.FontProvidersJson;
+import mnm.hdfontgen.pack.provider.StandardFontProviders;
 
 public class PackSettings {
     public final PackFormat format;
@@ -162,6 +162,10 @@ public class PackSettings {
                 var versions = format.getVersionRange();
 
                 return String.format("%s %s%s for Minecraft %s", fontName, size, withUnicode, versions);
+            }
+
+            public BitmapBuilder withFont(String font) {
+                return withFont(Font.decode(font));
             }
 
             public BitmapBuilder withFont(Font font) {

@@ -1,16 +1,17 @@
 package mnm.hdfontgen;
 
-import mnm.hdfontgen.pack.PackSettings;
-import mnm.hdfontgen.pack.PackFormat;
-import mnm.hdfontgen.pack.TextureSize;
-import mnm.hdfontgen.pack.provider.FontProvidersJson;
+import java.awt.*;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.TitledBorder;
-import java.awt.*;
-import java.io.IOException;
-import java.io.UncheckedIOException;
+
+import mnm.hdfontgen.pack.PackFormat;
+import mnm.hdfontgen.pack.PackSettings;
+import mnm.hdfontgen.pack.TextureSize;
+import mnm.hdfontgen.pack.provider.FontProvidersJson;
 
 /*
  * Mostly generated using Window Builder Pro

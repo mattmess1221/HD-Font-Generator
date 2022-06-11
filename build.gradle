@@ -19,7 +19,7 @@ javafx {
 application {
     // Define the main class for the application.
     mainModule = 'hdfontgen'
-    mainClass = 'mnm.hdfontgen.FontGenerator'
+    mainClass = 'mnm.hdfontgen.Main'
 }
 
 distZip.enabled = false
