@@ -36,3 +36,16 @@ Different options can be customized before generation. These include:
   256 pages, each with 256 characters. Fallback font uses the 
   [gnu uniform font](http://unifoundry.com/unifont/).
 - **Parallel**: Uses multiple threads to generate font bitmaps in parallel.
+
+## Development
+
+Note: The project uses JDK 17.
+
+### Gradle Tasks
+
+The following Gradle tasks can be used to run or build the project.
+
+- `./gradlew run` - Runs the project with gradle
+- `./gradlew build` - Build the project and package dependencies with a launch script. This is useful if you have the JDK installed already, though you have to extract it manually.
+- `./gradlew jPackageDist` - Create a platform-specific archive which bundles the JRE. The unarchived build files are located in `build/jpackage`.
+
