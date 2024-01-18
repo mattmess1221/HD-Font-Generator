@@ -38,11 +38,26 @@ public class HDFont {
                 int xPos = x * size;
                 int yPos = y * size;
                 var font = this.getFontForChar(charToRender);
+                var wdth = getCharBounds(font, charToRender).getWidth();
+
+                // Draw transparent background to persist monospace font width information.
+                //
+                // "The texture files of the default fonts contain a grid of white characters, which are automatically
+                // colored by Minecraft as needed in-game. The character sizes are automatically determined based on the
+                // last line of pixels containing any alpha value. Due to the way fonts are detected, filling the
+                // background of a character with a color containing a 5% alpha background causes the full width to
+                // render without generally having a visible background to the character. The default font character is
+                // 8×8 pixels, while accented.png is 9×12 pixels."
                 graphics.setClip(xPos, yPos, size, size);
+                graphics.setColor(new Color(255, 255, 255, 13)); // 5% of 255 is 12.75, rounded to 13
+                graphics.fillRect(xPos, yPos, (int) wdth, size);
+
+                // Draw the foreground character.
+                graphics.setClip(xPos, yPos, size, size);
+                graphics.setColor(Color.WHITE);
                 graphics.setFont(font);
                 graphics.drawChars(new char[]{charToRender}, 0, 1, xPos, yPos + yOffset);
 
-                var wdth = getCharBounds(font, charToRender).getWidth();
                 var data = (int) Math.ceil(wdth / size * 0xf);
                 sizes.write(data);
             }
